@@ -1,8 +1,15 @@
-package com.kote.taskifyapp.data
+package com.kote.taskifyapp.data.repository
 
+import com.kote.taskifyapp.data.Task
+import com.kote.taskifyapp.data.TaskDao
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class TaskRepository(private val taskDao: TaskDao) {
+@Singleton
+class TaskRepository @Inject constructor(
+    private val taskDao: TaskDao
+) {
     suspend fun insertTask(task: Task) = taskDao.insertTask(task)
     suspend fun getTaskById(taskId: Int): Task? = taskDao.getTaskById(taskId)
     fun getAllTasks(): Flow<List<Task>> = taskDao.getAllTasks()
