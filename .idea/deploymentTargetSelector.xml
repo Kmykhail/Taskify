@@ -16,16 +16,13 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="daoInsert_insertTaskIntoDb()">
+      <SelectionState runConfigName="TaskRepositoryTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="daoGetTaskById_returnsOneTaskFromDb()">
+      <SelectionState runConfigName="TaskRepositoryHiltTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="daoUpdate_updateTasksInDb()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="daoDelete_deleteTasksFromDb()">
+      <SelectionState runConfigName="testInsertTask()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
