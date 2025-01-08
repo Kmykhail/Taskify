@@ -79,9 +79,6 @@ class TaskDaoTest {
         assertEquals(task!!.id, 1)
     }
 
-    private suspend fun addTaskOnce() {
-        taskDao.insertTask(task1)
-    }
 
     @Test
     @Throws(IOException::class)
@@ -107,6 +104,10 @@ class TaskDaoTest {
         taskDao.deleteTask(task2)
 
         assertTrue(taskDao.getAllTasks().first().isEmpty())
+    }
+
+    private suspend fun addTaskOnce() {
+        taskDao.insertTask(task1)
     }
 
     private suspend fun addTwoTasks() {
