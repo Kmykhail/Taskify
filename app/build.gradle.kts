@@ -66,6 +66,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.common)
     implementation(libs.androidx.material.icons.extended.android)
+    implementation(libs.material)
+    implementation(libs.androidx.material)
 
     // Room database
     implementation(libs.androidx.room.runtime)
