@@ -10,6 +10,8 @@ import javax.inject.Singleton
 class TaskRepository @Inject constructor(
     private val taskDao: TaskDao
 ) {
+    val allTask: Flow<List<Task>> = taskDao.getAllTasks()
+
     suspend fun insertTask(task: Task) = taskDao.insertTask(task)
     suspend fun getTaskById(taskId: Int): Task? = taskDao.getTaskById(taskId)
     fun getAllTasks(): Flow<List<Task>> = taskDao.getAllTasks()
