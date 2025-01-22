@@ -13,9 +13,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessTimeFilled
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -131,11 +131,13 @@ fun HomeScreen(
                                 text = task.title ?: "Untitled",
                             )
                             Spacer(modifier = Modifier.weight(1f))
-                            Icon(
-                                imageVector = Icons.Default.AccessTimeFilled,
-                                contentDescription = "Clock",
-                                modifier = Modifier.size(24.dp)
-                            )
+                            if (task.time != null) {
+                                Icon(
+                                    imageVector = Icons.Outlined.AccessTime,
+                                    contentDescription = "Clock",
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
                         }
                     }
                 }

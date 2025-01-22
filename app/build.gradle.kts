@@ -69,6 +69,11 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.material)
 
+    // WorkManager
+    implementation(libs.androidx.work.runtime.ktx)
+
+    implementation(libs.accompanist.permissions)
+
     // Room database
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
