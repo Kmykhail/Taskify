@@ -12,9 +12,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -80,17 +79,14 @@ fun TaskScreen(
             horizontalArrangement = Arrangement.Start
         ) {
             IconButton(onClick = {openDatTimeSheet = !openDatTimeSheet}) {
-                Icon(imageVector = Icons.Default.CalendarMonth, contentDescription = "Set day and time")
+                Icon(imageVector = Icons.Outlined.CalendarMonth, contentDescription = "Set day and time", tint = viewModel.getTaskCalendarColor())
             }
             Box {
                 IconButton(onClick = {openPrioritySelector = !openPrioritySelector}) {
                     Icon(imageVector = Icons.Outlined.Flag, contentDescription = "Set priority", tint = viewModel.getTaskPriorityColor())
                 }
                 if (openPrioritySelector) {
-                    PriorityMenu(
-                        onDismissRequest = {openPrioritySelector = it},
-                        onPriorityChange = viewModel::updateTaskPriority
-                    )
+                    PriorityMenu(onDismissRequest = {openPrioritySelector = it}, onPriorityChange = viewModel::updateTaskPriority)
                 }
             }
             Spacer(modifier = Modifier.weight(1f))

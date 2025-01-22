@@ -21,7 +21,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
@@ -39,8 +38,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.data.Task
-import java.time.LocalDate
-import java.time.ZoneId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +50,7 @@ fun ModalDateTimeSheet(
 ) {
     val datePickerState = rememberDatePickerState(
         initialDisplayMode = DisplayMode.Picker,
-        initialSelectedDateMillis = task.date ?: LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        initialSelectedDateMillis = task.date ?: System.currentTimeMillis()
     )
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var openTimerPicker by remember { mutableStateOf(false) }
@@ -69,7 +66,7 @@ fun ModalDateTimeSheet(
         ) {
             IconButton(onClick = {
                 onDismissRequest(false)
-                datePickerState.selectedDateMillis = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                datePickerState.selectedDateMillis = System.currentTimeMillis()
                 selectedTime = null
             }) {
                 Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
@@ -90,7 +87,7 @@ fun ModalDateTimeSheet(
                     .padding(horizontal = 16.dp, vertical = 10.dp)
                     .clip(RoundedCornerShape(4.dp))
                     .background(color = Color.White)
-            ){
+            ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
