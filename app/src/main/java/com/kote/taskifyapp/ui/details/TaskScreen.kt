@@ -14,6 +14,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -89,6 +90,14 @@ fun TaskScreen(
                     PriorityMenu(onDismissRequest = {openPrioritySelector = it}, onPriorityChange = viewModel::updateTaskPriority)
                 }
             }
+            IconButton(
+                onClick = {
+                    viewModel.deleteTask()
+                    navigateBack()
+                }
+            ) {
+                Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete")
+            }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(
                 onClick = {
@@ -99,7 +108,7 @@ fun TaskScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Done,
-                    contentDescription = "Need implement", // TODO
+                    contentDescription = "Create/update task"
                 )
             }
         }
@@ -110,6 +119,7 @@ fun TaskScreen(
             task = task,
             onDateChange = viewModel::updateTaskDate,
             onTimeChange = viewModel::updateTaskTime,
+            removeReminder = viewModel::removeReminder,
             onDismissRequest = {openDatTimeSheet = it}
         )
     }

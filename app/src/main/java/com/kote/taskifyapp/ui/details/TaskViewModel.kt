@@ -1,9 +1,6 @@
 package com.kote.taskifyapp.ui.details
 
-import android.provider.CalendarContract.Calendars
 import android.util.Log
-import androidx.compose.foundation.MutatePriority
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -50,6 +47,7 @@ class TaskViewModel @Inject constructor(
                 Log.d("Debug", "check $isDateChosen, $isTimeChosen, $isCompleted")
                 if (isDateChosen && isTimeChosen && !isCompleted) {
                     reminderRepository.scheduleNotification(
+                        id,
                         title,
                         description,
                         calculateReminderTime(date!!, time!!)
@@ -63,6 +61,19 @@ class TaskViewModel @Inject constructor(
                 repository.insertTask(_taskState.value)
             }
         }
+    }
+
+    fun deleteTask() {
+        viewModelScope.launch {
+            if (!taskId.isNullOrEmpty()) {
+                removeReminder(_taskState.value.id)
+                repository.deleteTask(_taskState.value)
+            }
+        }
+    }
+
+    fun removeReminder(id: Int) {
+        reminderRepository.removeNotification(id)
     }
 
     fun getTaskPriorityColor(): Color {
