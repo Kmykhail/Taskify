@@ -1,4 +1,4 @@
-package com.kote.taskifyapp.data.workers
+package com.kote.taskifyapp.data.worker
 
 import android.content.Context
 import android.util.Log
