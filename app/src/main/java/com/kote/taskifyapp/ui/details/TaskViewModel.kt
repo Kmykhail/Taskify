@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.Calendar
 import javax.inject.Inject
@@ -52,8 +51,9 @@ class TaskViewModel @Inject constructor(
 
     fun restoreTask() {
         viewModelScope.launch {
-            _taskState.update { it.copy(isCompleted = false) }
+            _taskState.update { it.copy(isCompleted = false, deletionTime = null) }
             repository.updateTask(_taskState.value)
+            workRepository.cancelCompletedTask(_taskState.value.id)
         }
     }
 

@@ -20,7 +20,7 @@ class CompletedTaskWorker(
         taskRepository.getTaskById(taskId.toInt())?.let {
             if (it.isCompleted && it.deletionTime != null && it.deletionTime <= System.currentTimeMillis()) {
                 taskRepository.deleteTask(it)
-                resultState =  Result.success()
+                resultState = Result.success()
             } else {
                 Log.w("Warning", "task scheduled for deletion but not completed, id:${it.id}, title:${it.title}")
                 resultState = Result.failure()

@@ -60,19 +60,16 @@ class WorkManagerRepository @Inject constructor(
         }
     }
 
-    fun cancelAlarmNotification(taskId: Int) {
+    fun cancelAlarmNotification(id: Int) {
         val intent = Intent(context, ReminderReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(context, taskId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         alarmManager.cancel(pendingIntent)
-        Log.d("Debug", "Cancel alarm notification for task id: $taskId")
+        Log.d("Debug", "Cancel alarm notification for task id: $id")
     }
     // Notification end
 
     // Cleanup start
     fun scheduleCompletedTask(id: Int) {
-        Log.d("Debug",
-            "WorkManager, `completed task` delay:$DELAY_FOR_DELETE, deletionTime:${System.currentTimeMillis() + DELAY_FOR_DELETE}")
-
         val constraints = Constraints.Builder()
             .setRequiresBatteryNotLow(false)
             .setRequiresCharging(false)
@@ -90,15 +87,12 @@ class WorkManagerRepository @Inject constructor(
             ExistingWorkPolicy.REPLACE,
             cleanupRequest
         )
-
-        val workInfos = workManager.getWorkInfosForUniqueWork(id.toString() + CLEANUP).get()
-        workInfos.forEach { workInfo ->
-            Log.d("Debug", "WorkManager, `completed task` state: ${workInfo.state}")
-        }
+        Log.d("Debug", "Scheduled deletion for task id: $id, time: ${System.currentTimeMillis() + DELAY_FOR_DELETE}")
     }
 
     fun cancelCompletedTask(id: Int) {
         workManager.cancelUniqueWork(id.toString() + CLEANUP)
+        Log.d("Debug", "Cancel deletion for task id: $id")
     }
     // Cleanup end
 }
