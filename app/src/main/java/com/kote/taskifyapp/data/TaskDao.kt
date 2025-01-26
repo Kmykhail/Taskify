@@ -16,6 +16,9 @@ interface TaskDao {
     @Query("SELECT * FROM tasks WHERE id = :taskId")
     suspend fun getTaskById(taskId: Int): Task?
 
+    @Query("SELECT * FROM tasks WHERE date IS NOT NULL and date < :currentDate")
+    suspend fun getOutdatedTasks(currentDate: Long) : List<Task>
+
     @Query("SELECT * FROM tasks ORDER BY id DESC")
     fun getAllTasksDesc() : Flow<List<Task>>
 

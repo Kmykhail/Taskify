@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kote.taskifyapp.data.Priority
+import com.kote.taskifyapp.data.ReminderType
 import com.kote.taskifyapp.data.Task
 import com.kote.taskifyapp.data.repository.WorkManagerRepository
 import com.kote.taskifyapp.data.repository.TaskRepository
@@ -60,7 +61,7 @@ class TaskViewModel @Inject constructor(
     fun saveTask() {
         viewModelScope.launch {
             _taskState.value.run {
-                if (date != null && time != null) {
+                if (date != null && time != null && reminderType == ReminderType.OnTime ) {
                     workRepository.scheduleAlarmNotification(id, title, description, calculateReminderTime(date, time))
                 }
                 if (isCreated) {

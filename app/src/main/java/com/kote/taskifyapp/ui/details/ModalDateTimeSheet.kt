@@ -8,18 +8,22 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,6 +45,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.kote.taskifyapp.data.Priority
 import com.kote.taskifyapp.data.Task
 import com.kote.taskifyapp.ui.components.OpenTimerPicker
 import com.kote.taskifyapp.ui.components.ShowPermissionDialog
@@ -70,6 +75,7 @@ fun ModalDateTimeSheet(
         initialHour = task.time?.div(60) ?: 0,
         initialMinute = task.time?.rem(60) ?: 0
     )
+    var openReminderSelector by remember { mutableStateOf(false) }
 
     // notification permission
     val context = LocalContext.current
@@ -145,6 +151,24 @@ fun ModalDateTimeSheet(
                             onTimeChange(null)
                             removeReminder(task.id)
                         }) { Icon(imageVector = Icons.Default.Close, contentDescription = "Remove reminder") }
+                    }
+                }
+                Box{
+                    TextButton(onClick = {openReminderSelector = !openReminderSelector}) {
+                        Text(task.reminderType.name) // TODO add lambda to set reminder type
+                    }
+                    if (openReminderSelector) {
+                        DropdownMenu(
+                            expanded = true,
+                            onDismissRequest = {openReminderSelector = !openReminderSelector}
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("None") },
+                                onClick = {
+                                    openReminderSelector = false
+                                }
+                            )
+                        }
                     }
                 }
             }
