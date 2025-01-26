@@ -11,9 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.logging.Filter
 import javax.inject.Inject
 
 enum class SortType {
@@ -21,30 +24,28 @@ enum class SortType {
 }
 
 enum class FilterType {
-    ALL, COMPLETED, INCOMPLETED
+    SHOW_ACTIVE, SHOW_COMPLETED
 }
+
+data class TasksUiState(
+    val filterType: FilterType = FilterType.SHOW_ACTIVE,
+    val sortType: SortType = SortType.DATE
+)
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: TaskRepository,
     private val workRepository: WorkManagerRepository
 ) : ViewModel() {
-    private val _sortType = MutableStateFlow(SortType.DATE)
-    private val _filterType = MutableStateFlow(FilterType.ALL)
+    private val _tasksUiState = MutableStateFlow(TasksUiState())
+    val tasksUiState = _tasksUiState.asStateFlow()
 
     val tasks: StateFlow<List<Task>> = repository.allTask
-        .combine(_sortType) { tasks, sortType ->
-            when (sortType) {
+        .combine(_tasksUiState) { tasks, uiState ->
+            when (uiState.sortType) {
                 SortType.TITLE -> tasks.sortedBy { it.title }
                 SortType.DATE -> tasks.sortedBy { it.date }
                 SortType.PRIORITY -> tasks.sortedBy { it.priority }
-            }
-        }
-        .combine(_filterType) { tasks, filterType ->
-            when (filterType) {
-                FilterType.ALL -> tasks
-                FilterType.COMPLETED -> tasks.filter { it.isCompleted }
-                FilterType.INCOMPLETED -> tasks.filter { !it.isCompleted }
             }
         }
         .stateIn(
@@ -53,8 +54,8 @@ class HomeViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
-    fun setSortType(sortType: SortType) { _sortType.value = sortType }
-    fun setFilterType(filterType: FilterType) { _filterType.value = filterType }
+    fun setSortType(sortType: SortType) { _tasksUiState.update { it.copy(sortType = sortType) }}
+    fun setFilterType(filterType: FilterType) { _tasksUiState.update { it.copy(filterType = filterType) } }
 
     fun getNumberActiveTasks(): Int {
         return tasks.value.count { !it.isCompleted }
@@ -62,7 +63,7 @@ class HomeViewModel @Inject constructor(
 
     fun markAsCompleted(taskId: Int) {
         viewModelScope.launch {
-            tasks.value.find { it.id == taskId }?.let {
+            tasks.value.find { it.id == taskId}?.let {
                 val updated = it.copy(
                     isCompleted = true,
                     deletionTime = System.currentTimeMillis() + DELAY_FOR_DELETE

@@ -120,7 +120,7 @@ fun TaskScreen(
             task = task,
             onDateChange = viewModel::updateTaskDate,
             onTimeChange = viewModel::updateTaskTime,
-            removeReminder = viewModel::removeReminder,
+            removeReminder = viewModel::cancelNotificationWork,
             onDismissRequest = {openDatTimeSheet = it}
         )
     }

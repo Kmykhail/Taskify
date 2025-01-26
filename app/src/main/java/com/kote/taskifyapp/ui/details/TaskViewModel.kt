@@ -56,14 +56,19 @@ class TaskViewModel @Inject constructor(
     fun deleteTask() {
         viewModelScope.launch {
             if (_taskState.value.isCreated) {
-                removeReminder(_taskState.value.id)
+                cancelNotificationWork(_taskState.value.id)
+                cancelCompletedTask(_taskState.value.id)
                 repository.deleteTask(_taskState.value)
             }
         }
     }
 
-    fun removeReminder(id: Int) {
-        workRepository.removeNotification(id)
+    fun cancelNotificationWork(id: Int) {
+        workRepository.cancelNotification(id)
+    }
+
+    private fun cancelCompletedTask(id: Int) {
+        workRepository.cancelCompletedTask(id)
     }
 
     fun getTaskPriorityColor(): Color {
