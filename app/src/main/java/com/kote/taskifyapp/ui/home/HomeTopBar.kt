@@ -49,8 +49,8 @@ fun HomeTopBar(
     }
 
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {

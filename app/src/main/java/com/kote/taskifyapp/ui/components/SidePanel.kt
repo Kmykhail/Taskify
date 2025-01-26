@@ -42,7 +42,7 @@ fun SidePanel(
     selectedFilterType: GroupTasksType,
     onSelectedFilterType: (GroupTasksType) -> Unit,
     gestureEnabled: Boolean = true,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
     val items = listOf(
