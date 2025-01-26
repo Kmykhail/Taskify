@@ -1,6 +1,5 @@
 package com.kote.taskifyapp.ui.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kote.taskifyapp.DELAY_FOR_DELETE

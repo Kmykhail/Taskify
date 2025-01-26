@@ -25,7 +25,7 @@ fun TaskifyNavGraph(
     ) {
         composable(route = "home") {
             HomeScreen(
-                viewModel = hiltViewModel<HomeViewModel>(),
+                homeViewModel = hiltViewModel<HomeViewModel>(),
                 onNavigateToTaskDetails = { taskId, date ->
                     navController.navigate("details/$taskId?date=$date")
                 },
