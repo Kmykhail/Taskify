@@ -25,13 +25,13 @@ enum class SortType {
     TITLE, DATE, PRIORITY
 }
 
-enum class TaskFilterType {
+enum class GroupTasksType {
     ALL, TODAY, PLANNED, COMPLETED, IMPORTANT
 }
 
 data class TasksUiState(
-    val taskFilterType: TaskFilterType = TaskFilterType.ALL,
-    val sortType: SortType = SortType.DATE
+    val groupTasksType: GroupTasksType = GroupTasksType.ALL,
+    val sortType: SortType = SortType.DATE,
 )
 
 @HiltViewModel
@@ -42,40 +42,59 @@ class HomeViewModel @Inject constructor(
     private val _tasksUiState = MutableStateFlow(TasksUiState())
     val tasksUiState = _tasksUiState.asStateFlow()
 
-    val tasks: StateFlow<List<Task>> = repository.allTask
-        .combine(_tasksUiState) { tasks, uiState ->
-            val filteredTasks = when (uiState.taskFilterType) {
-                TaskFilterType.TODAY -> {
-                    tasks.filter {
-                        val taskDate = it.date?.let { it1 ->
-                            Instant
-                                .ofEpochMilli(it1)
-                                .atZone(ZoneId.systemDefault())
-                                .toLocalDate()
+    private val _groupedTasks = MutableStateFlow(emptyMap<String, List<Task>>())
+    val groupedTask = _groupedTasks.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            repository.allTask
+                .combine(_tasksUiState) { tasks, uiState ->
+                    val currentDate = LocalDate.now()
+                    when (uiState.groupTasksType) {
+                        GroupTasksType.ALL -> {
+                            tasks.groupBy {
+                                when {
+                                    it.isCompleted -> "Completed"
+                                    it.date != null && convertMillisToDate(it.date) < currentDate -> "Outdated"
+                                    it.date == null -> "Not planned"
+                                    else -> "Active"
+                                }
+                            }
                         }
-                        taskDate != null && taskDate == LocalDate.now()
+                        GroupTasksType.TODAY -> {
+                            tasks.filter { it.date != null && convertMillisToDate(it.date) <= currentDate }
+                                .groupBy {
+                                    when {
+                                        it.isCompleted -> "Completed"
+                                        convertMillisToDate(it.date!!) == currentDate -> "Today"
+                                        else -> "Outdated"
+                                    }
+                                }
+                        }
+                        GroupTasksType.COMPLETED -> {
+                            mapOf("Completed" to tasks.filter { it.isCompleted })
+                        }
+                        GroupTasksType.PLANNED -> {
+                            mapOf("Planned" to tasks.filter {
+                                it.date != null && !it.isCompleted && convertMillisToDate(it.date) >= currentDate
+                            })
+                        }
+                        GroupTasksType.IMPORTANT -> {
+                            mapOf("Important" to tasks.filter { it.isFavorite })
+                        }
                     }
                 }
-                TaskFilterType.PLANNED -> tasks.filter { it.date != null && !it.isCompleted }
-                TaskFilterType.COMPLETED -> tasks.filter { it.isCompleted }
-                TaskFilterType.ALL -> tasks.filter { true }
-                TaskFilterType.IMPORTANT -> tasks
-            }
-
-            when (uiState.sortType) {
-                SortType.TITLE -> filteredTasks.sortedBy { it.title }
-                SortType.DATE -> filteredTasks.sortedBy { it.date }
-                SortType.PRIORITY -> filteredTasks.sortedBy { it.priority }
-            }
+                .collect { groupedTasks ->
+                    _groupedTasks.value = groupedTasks
+                }
         }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+    }
 
     fun setSortType(sortType: SortType) { _tasksUiState.update { it.copy(sortType = sortType) }}
-    fun setFilterType(taskFilterType: TaskFilterType) { _tasksUiState.update { it.copy(taskFilterType = taskFilterType) } }
+
+    fun setGroupTasksType(groupTasksType: GroupTasksType) {
+        _tasksUiState.update { it.copy(groupTasksType = groupTasksType) }
+    }
 
     fun deleteSelectedTasks(selectedTaskIds: Set<Int>) {
         viewModelScope.launch {
@@ -83,10 +102,9 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun markAsCompleted(taskId: Int) {
+    fun markAsCompleted(group: String, taskId: Int) {
         viewModelScope.launch {
-            println("WTF taskID, $taskId")
-            tasks.value.find { it.id == taskId}?.let {
+            _groupedTasks.value[group]?.find { it.id == taskId }?.let {
                 val updated = it.copy(
                     isCompleted = true,
                     deletionTime = System.currentTimeMillis() + DELAY_FOR_DELETE
@@ -98,5 +116,10 @@ class HomeViewModel @Inject constructor(
                 workRepository.cancelAlarmNotification(taskId)
             }
         }
+    }
+    private fun convertMillisToDate(date: Long): LocalDate {
+        return Instant.ofEpochMilli(date)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
     }
 }

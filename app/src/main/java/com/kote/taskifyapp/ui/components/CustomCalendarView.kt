@@ -46,11 +46,10 @@ import java.time.ZoneId
 
 @Composable
 fun CustomCalendarView(
-    tasks: List<Task>,
-    tasksUiState: TasksUiState,
+    groupedTasks: Map<String, List<Task>>,
     onSelectedDate: (String) -> Unit,
     onNavigateToTaskDetails: (String, String?) -> Unit,
-    markAsCompleted: (Int) -> Unit,
+    markAsCompleted: (String, Int) -> Unit,
     paddingValues: PaddingValues,
 ) {
     val pagerState = rememberPagerState(initialPage = Int.MAX_VALUE / 2, pageCount = { Int.MAX_VALUE })
@@ -96,8 +95,7 @@ fun CustomCalendarView(
             CalendarView(
                 month = YearMonth.now().plusMonths(page - (Int.MAX_VALUE / 2).toLong()),
                 onSelectedDate = onSelectedDate,
-                tasks = tasks,
-                tasksUiState = tasksUiState,
+                groupedTasks = groupedTasks,
                 onNavigateToTaskDetails = onNavigateToTaskDetails,
                 markAsCompleted = markAsCompleted
             )
@@ -109,21 +107,23 @@ fun CustomCalendarView(
 private fun CalendarView(
     month: YearMonth,
     onSelectedDate: (String) -> Unit,
-    tasks: List<Task>,
-    tasksUiState: TasksUiState,
+    groupedTasks: Map<String, List<Task>>,
     onNavigateToTaskDetails: (String, String?) -> Unit,
-    markAsCompleted: (Int) -> Unit,
+    markAsCompleted: (String, Int) -> Unit,
 ) {
     val daysInMonth = month.lengthOfMonth()
     val daysList = remember(month){ (1 .. daysInMonth).map { month.atDay(it) } }
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
-    val tasksByDate = remember(tasks, daysList) {
-        val map = mutableStateMapOf<LocalDate, MutableList<Task>>()
-        tasks.forEach { task ->
-            if (task.date != null) {
-                val taskLocalDate = Instant.ofEpochMilli(task.date).atZone(ZoneId.systemDefault()).toLocalDate()
-                daysList.find { taskLocalDate.isEqual(it) }?.let {
-                    map.getOrPut(taskLocalDate) { mutableListOf() }.add(task)
+    val groupedTasksByDate = remember(groupedTasks, daysList) {
+        val map = mutableStateMapOf<LocalDate, MutableMap<String, MutableList<Task>>>()
+        groupedTasks.forEach { (group, tasks) ->
+            tasks.forEach { task ->
+                if (task.date != null) {
+                    val taskLocalDate =
+                        Instant.ofEpochMilli(task.date).atZone(ZoneId.systemDefault()).toLocalDate()
+                    daysList.find { taskLocalDate.isEqual(it) }?.let {
+                        map.getOrPut(taskLocalDate) { mutableMapOf() }.getOrPut(group) { mutableListOf() }.add(task)
+                    }
                 }
             }
         }
@@ -161,7 +161,7 @@ private fun CalendarView(
                         text = day.dayOfMonth.toString(),
                         textAlign = TextAlign.Center
                     )
-                    if (tasksByDate.contains(day)) {
+                    if (groupedTasksByDate.contains(day)) {
                         Icon(
                             imageVector = Icons.Default.Circle,
                             tint = Color.Blue,
@@ -173,10 +173,9 @@ private fun CalendarView(
             }
         }
 
-        tasksByDate[selectedDate]?.toList()?.let {
+        groupedTasksByDate[selectedDate]?.toMap()?.let {
             HomeListView(
-                tasks = it,
-                tasksUiState = tasksUiState,
+                groupedTasks = it,
                 onNavigateToTaskDetails = onNavigateToTaskDetails,
                 onNavigateToSelectionScreen = {},
                 markAsCompleted = markAsCompleted,

@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,9 +41,10 @@ fun HomeTasksSelectionScreen(
     navigationBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val tasks by viewModel.tasks.collectAsState()
+    val groupedTasks by viewModel.groupedTask.collectAsState()
     var isSelectedAll by remember { mutableStateOf(false) }
     var selectedTask by remember { mutableStateOf(setOf<Int>()) }
+    val tasks = groupedTasks.values.flatten()
 
     selectedTask = when (isSelectedAll) {
         true -> tasks.map { it.id }.toSet()

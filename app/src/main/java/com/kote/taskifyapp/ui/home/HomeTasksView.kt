@@ -19,7 +19,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -29,7 +28,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -52,6 +50,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -63,55 +62,38 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun HomeListView(
-    tasks: List<Task>,
-    tasksUiState: TasksUiState,
+    groupedTasks: Map<String, List<Task>>,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
-    markAsCompleted: (Int) -> Unit,
+    markAsCompleted: (String, Int) -> Unit,
+    groupTasksType: GroupTasksType? = null,
     paddingValues: PaddingValues = PaddingValues(0.dp),
 ) {
     val expandedStates = remember { mutableStateMapOf<String, Boolean>() }
-    when (tasksUiState.taskFilterType) {
-        TaskFilterType.ALL -> {
-            val sortedTasks = tasks.sortedBy { it.isCompleted }
-            val groupedTasks = sortedTasks.groupBy { if (it.isCompleted) "Completed" else "Active" }
-
-            LazyColumn(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .padding(horizontal = 10.dp)
-                    .fillMaxSize()
-            ) {
-                groupedTasks.forEach { (title, taskList) ->
-                    if (taskList.isNotEmpty()) {
-                        item {
-                            if (title == "Completed") Spacer(modifier = Modifier.height(20.dp))
-                            TaskSection(
-                                title = title,
-                                tasks = taskList,
-                                isExpanded = expandedStates.getOrPut(title) { true },
-                                onToggleExpand = { expandedStates[title] = !expandedStates[title]!! },
-                                onNavigateToTaskDetails = onNavigateToTaskDetails,
-                                onNavigateToSelectionScreen = onNavigateToSelectionScreen,
-                                markAsCompleted = markAsCompleted
+    LazyColumn(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .padding(paddingValues)
+            .padding(horizontal = 10.dp)
+            .fillMaxSize()
+    ) {
+        val firstKey = groupedTasks.keys.firstOrNull()
+        groupedTasks.forEach { (title, taskList) ->
+            if (taskList.isNotEmpty()) {
+                item {
+                    if (firstKey != title) Spacer(modifier = Modifier.height(20.dp))
+                    groupTasksType?.let {
+                        if (it == GroupTasksType.COMPLETED) {
+                            Text(
+                                "Completed tasks will be deleted after 30 days",
+                                textAlign = TextAlign.Justify,
+                                modifier = Modifier.padding(horizontal = 10.dp)
                             )
                         }
                     }
-                }
-            }
-        }
-        else -> {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .padding(horizontal = 10.dp)
-                    .fillMaxSize()
-            ) {
-                val title = tasksUiState.taskFilterType.name.lowercase().replaceFirstChar { it.uppercase() }
-                item {
                     TaskSection(
                         title = title,
-                        tasks = tasks,
+                        tasks = taskList,
                         isExpanded = expandedStates.getOrPut(title) { true },
                         onToggleExpand = { expandedStates[title] = !expandedStates[title]!! },
                         onNavigateToTaskDetails = onNavigateToTaskDetails,
@@ -132,7 +114,7 @@ fun TaskSection(
     onToggleExpand: () -> Unit,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
-    markAsCompleted: (Int) -> Unit
+    markAsCompleted: (String, Int) -> Unit
 ) {
     if (tasks.isNotEmpty()) {
         Column(
@@ -152,7 +134,7 @@ fun TaskSection(
                             task = task,
                             onNavigateToTaskDetails = onNavigateToTaskDetails,
                             onNavigateToSelectionScreen = onNavigateToSelectionScreen,
-                            markAsCompleted = markAsCompleted
+                            markAsCompleted = {markAsCompleted(title, task.id)}
                         )
                     }
                 }
@@ -204,7 +186,7 @@ private fun TaskItem(
     task: Task,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
-    markAsCompleted: (Int) -> Unit,
+    markAsCompleted: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -238,7 +220,7 @@ private fun TaskItem(
     ) {
         Checkbox(
             checked = task.isCompleted,
-            onCheckedChange = { if (!task.isCompleted) markAsCompleted(task.id) },
+            onCheckedChange = { if (!task.isCompleted) markAsCompleted() },
             enabled = !task.isCompleted
         )
         Text(

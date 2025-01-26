@@ -20,6 +20,7 @@ import com.kote.taskifyapp.ui.navigation.UserHomeScreens
 @Composable
 fun HomeBottomBar(
     clickableScreen: MutableState<UserHomeScreens>,
+    onCalendarGroupChange: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -39,7 +40,10 @@ fun HomeBottomBar(
             )
         }
         IconButton(
-            onClick = { clickableScreen.value = UserHomeScreens.CALENDAR }
+            onClick = {
+                onCalendarGroupChange()
+                clickableScreen.value = UserHomeScreens.CALENDAR
+            }
         ) {
             Icon(
                 imageVector = Icons.Default.CalendarToday,
