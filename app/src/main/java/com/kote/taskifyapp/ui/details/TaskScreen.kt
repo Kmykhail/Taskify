@@ -65,7 +65,7 @@ fun TaskScreen(
         verticalArrangement = Arrangement.Top,
         modifier = modifier
             .padding(horizontal = 16.dp, vertical = 10.dp)
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(10.dp))
             .background(color = MaterialTheme.colorScheme.surfaceContainer)
     ) {
         CustomTextField(
