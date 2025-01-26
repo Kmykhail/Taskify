@@ -1,5 +1,6 @@
 package com.kote.taskifyapp.ui.details
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -59,6 +61,11 @@ fun TaskScreen(
 
     val openDatTimeSheet = remember { mutableStateOf(false) }
     val openPrioritySelector = remember { mutableStateOf(false) }
+
+    DisposableEffect(Unit) {
+        Log.d("Debug", "TaskScreen Entered")
+        onDispose { Log.d("Debug", "TaskScreen Exited") }
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

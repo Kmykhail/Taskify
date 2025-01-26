@@ -26,6 +26,7 @@ fun TaskifyNavGraph(
     modifier: Modifier = Modifier
 ) {
     val userScreens = remember { mutableStateOf(UserHomeScreens.TASKS) }
+    val selectedDate = remember { mutableStateOf<Long?>(null) }
 
     NavHost(
         navController = navController,
@@ -35,6 +36,7 @@ fun TaskifyNavGraph(
             HomeScreen(
                 viewModel = hiltViewModel<HomeViewModel>(),
                 userHomeScreens = userScreens,
+                previousSelectedDate = selectedDate,
                 onNavigateToTaskDetails = { taskId, date ->
                     navController.navigate("details/$taskId?date=$date")
                 },
