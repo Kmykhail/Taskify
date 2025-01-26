@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun HomeBottomBar(
+    onClick: (UserHomeScreens) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -24,7 +25,7 @@ fun HomeBottomBar(
         modifier = modifier
     ) {
         IconButton(
-            onClick = {}
+            onClick = {onClick(UserHomeScreens.TASKS)}
         ) {
             Icon(
                 imageVector = Icons.Default.Task,
@@ -33,7 +34,7 @@ fun HomeBottomBar(
             )
         }
         IconButton(
-            onClick = {}
+            onClick = {onClick(UserHomeScreens.CALENDAR)}
         ) {
             Icon(
                 imageVector = Icons.Default.CalendarToday,
@@ -42,7 +43,7 @@ fun HomeBottomBar(
             )
         }
         IconButton(
-            onClick = {},
+            onClick = {onClick(UserHomeScreens.SETTINGS)},
         ) {
             Icon(
                 imageVector = Icons.Default.Settings,

@@ -3,7 +3,6 @@ package com.kote.taskifyapp.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -44,12 +43,19 @@ fun TaskifyNavGraph(
             )
         }
         composable(
-            route = "details/{taskId}?",
-            arguments = listOf(navArgument("taskId") {
-                type = NavType.StringType
-                defaultValue = null
-                nullable = true
-            })
+            route = "details/{taskId}?date={date}",
+            arguments = listOf(
+                navArgument("taskId") {
+                    type = NavType.StringType
+                    defaultValue = null
+                    nullable = true
+                },
+//                navArgument("date") {
+//                    type = NavType.StringType
+//                    defaultValue = null
+//                    nullable = true
+//                }
+            )
         ) {
             TaskScreen(
                 viewModel = hiltViewModel<TaskViewModel>(),

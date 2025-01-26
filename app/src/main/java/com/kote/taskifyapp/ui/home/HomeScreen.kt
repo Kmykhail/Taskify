@@ -12,9 +12,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.kote.taskifyapp.ui.components.CustomCalendarView
+
+enum class UserHomeScreens {
+    TASKS, CALENDAR, SETTINGS
+}
 
 @Composable
 fun HomeScreen(
@@ -25,6 +33,7 @@ fun HomeScreen(
 ) {
     val tasks by viewModel.tasks.collectAsState()
     val tasksUiState by viewModel.tasksUiState.collectAsState()
+    var userScreens by remember { mutableStateOf(UserHomeScreens.CALENDAR) }
 
     Scaffold(
         topBar = {
@@ -40,6 +49,7 @@ fun HomeScreen(
         },
         bottomBar = {
             HomeBottomBar(
+                onClick = {userScreens = it},
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp, bottom = 24.dp, start = 32.dp, end = 32.dp)
@@ -62,13 +72,27 @@ fun HomeScreen(
             }
         }
     ) { paddingValues ->
-        HomeListView(
-            tasks = tasks,
-            tasksUiState = tasksUiState,
-            onNavigateToTaskDetails = onNavigateToTaskDetails,
-            onNavigateToSelectionScreen = onNavigateToSelectionScreen,
-            markAsCompleted = viewModel::markAsCompleted,
-            paddingValues = paddingValues
-        )
+        when (userScreens) {
+            UserHomeScreens.TASKS -> {
+                HomeListView(
+                    tasks = tasks,
+                    tasksUiState = tasksUiState,
+                    onNavigateToTaskDetails = onNavigateToTaskDetails,
+                    onNavigateToSelectionScreen = onNavigateToSelectionScreen,
+                    markAsCompleted = viewModel::markAsCompleted,
+                    paddingValues = paddingValues
+                )
+            }
+            UserHomeScreens.CALENDAR -> {
+                CustomCalendarView(
+                    tasks = tasks,
+                    tasksUiState = tasksUiState,
+                    onNavigateToTaskDetails = onNavigateToTaskDetails,
+                    markAsCompleted = viewModel::markAsCompleted,
+                    paddingValues = paddingValues
+                )
+            }
+            UserHomeScreens.SETTINGS -> Unit
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.kote.taskifyapp.ui.details
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -15,7 +16,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import javax.inject.Inject
-import kotlin.math.max
 
 @HiltViewModel
 class TaskViewModel @Inject constructor(
@@ -30,6 +30,8 @@ class TaskViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val taskId: String? = savedStateHandle["taskId"]
+//            val date: String? = savedStateHandle["date"]
+//            Log.d("Debug", "TaskViewModel, taskId:${taskId}, date:${date}")
             repository.getAllTasksDesc().collect{ tasks ->
                 if (!taskId.isNullOrEmpty()) {
                     tasks.firstOrNull{ it.id == taskId.toInt() }?.let { _taskState.value = it }
