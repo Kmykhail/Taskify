@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.outlined.CalendarMonth
@@ -25,9 +26,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -51,6 +55,7 @@ import com.kote.taskifyapp.data.Priority
 import com.kote.taskifyapp.data.Task
 import java.util.concurrent.TimeUnit
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskScreen(
     viewModel: TaskViewModel,
@@ -65,85 +70,102 @@ fun TaskScreen(
     val openDatTimeSheet = remember { mutableStateOf(false) }
     val openPrioritySelector = remember { mutableStateOf(false) }
 
-
     DisposableEffect(Unit) {
         Log.d("Debug", "TaskScreen Entered")
         onDispose { Log.d("Debug", "TaskScreen Exited") }
     }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
-        modifier = modifier
-            .padding(horizontal = 16.dp, vertical = 10.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(color = MaterialTheme.colorScheme.surfaceContainer)
-    ) {
-        CustomTextField(
-            value = task.title ?: "",
-            placeholder = stringResource(R.string.name_textfield_placeholder),
-            onValueChange = viewModel::updateTaskTitle,
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions(onNext = { focusRequester2.requestFocus() }),
-            isSingleLine = true,
-            readOnly = task.isCompleted,
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester1)
-        )
-        Box(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .heightIn(min = 56.dp, max = (LocalConfiguration.current.screenHeightDp * 0.8).dp)
+    LaunchedEffect(Unit) {
+        focusRequester1.requestFocus()
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {},
+                navigationIcon = {
+                    IconButton(onClick = navigateBack) {
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
+            modifier = modifier
+                .padding(paddingValues)
+                .padding(horizontal = 10.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(color = MaterialTheme.colorScheme.surfaceContainer)
         ) {
             CustomTextField(
-                value = task.description ?: "",
-                placeholder = stringResource(R.string.description_textfield_placeholder),
-                onValueChange = viewModel::updateTaskDescription,
+                value = task.title ?: "",
+                placeholder = stringResource(R.string.name_textfield_placeholder),
+                onValueChange = viewModel::updateTaskTitle,
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(onNext = { focusRequester2.requestFocus() }),
+                isSingleLine = true,
                 readOnly = task.isCompleted,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .focusRequester(focusRequester2)
+                    .focusRequester(focusRequester1)
             )
+            Box(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .heightIn(min = 56.dp, max = (LocalConfiguration.current.screenHeightDp * 0.8).dp)
+            ) {
+                CustomTextField(
+                    value = task.description ?: "",
+                    placeholder = stringResource(R.string.description_textfield_placeholder),
+                    onValueChange = viewModel::updateTaskDescription,
+                    readOnly = task.isCompleted,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester2)
+                )
+            }
+            if (task.isCompleted) {
+                ShowCompletedBar(
+                    task = task,
+                    onRestoreClick = {
+                        viewModel.restoreTask()
+                        navigateBack()
+                    },
+                    onDeleteClick = {
+                        viewModel.deleteTask()
+                        navigateBack()
+                    }
+                )
+            } else {
+                ShowIncompleteBar(
+                    task = task,
+                    openDatTimeSheet = openDatTimeSheet,
+                    openPrioritySelector = openPrioritySelector,
+                    updateTaskPriority = viewModel::updateTaskPriority,
+                    onDeleteTask = {
+                        viewModel.deleteTask()
+                        navigateBack()
+                    },
+                    onSaveTask = {
+                        viewModel.saveTask()
+                        navigateBack()
+                    }
+                )
+            }
         }
-        if (task.isCompleted) {
-            ShowCompletedBar(
-                task = task,
-                onRestoreClick = {
-                    viewModel.restoreTask()
-                    navigateBack()
-                },
-                onDeleteClick = {
-                    viewModel.deleteTask()
-                    navigateBack()
-                }
-            )
-        } else {
-            ShowIncompleteBar(
-                task = task,
-                openDatTimeSheet = openDatTimeSheet,
-                openPrioritySelector = openPrioritySelector,
-                updateTaskPriority = viewModel::updateTaskPriority,
-                onDeleteTask = {
-                    viewModel.deleteTask()
-                    navigateBack()
-                },
-                onSaveTask = {
-                    viewModel.saveTask()
-                    navigateBack()
-                }
-            )
-        }
-    }
 
-    if (openDatTimeSheet.value) {
-        ModalDateTimeSheet(
-            task = task,
-            onDateChange = viewModel::updateTaskDate,
-            onTimeChange = viewModel::updateTaskTime,
-            onReminderChange = viewModel::updateReminderType,
-            onDismissRequest = {openDatTimeSheet.value = it}
-        )
+        if (openDatTimeSheet.value) {
+            ModalDateTimeSheet(
+                task = task,
+                onDateChange = viewModel::updateTaskDate,
+                onTimeChange = viewModel::updateTaskTime,
+                onReminderChange = viewModel::updateReminderType,
+                onDismissRequest = {openDatTimeSheet.value = it}
+            )
+        }
     }
 }
 
@@ -168,7 +190,8 @@ private fun ShowCompletedBar(
     }
     Text(
         text = "This task will be deleted in ${TimeUnit.MILLISECONDS.toDays(task.deletionTime!! - System.currentTimeMillis())} day",
-        textAlign = TextAlign.Justify
+        textAlign = TextAlign.Justify,
+        modifier = Modifier.padding(bottom = 8.dp)
     )
 }
 
