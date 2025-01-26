@@ -27,6 +27,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,6 +65,11 @@ fun ModalDateTimeSheet(
     // timerPicker
     var openTimerPicker by remember { mutableStateOf(false) }
     var selectedTime: Int? = task.time
+    val timePickerState = rememberTimePickerState(
+        is24Hour = true,
+        initialHour = task.time?.div(60) ?: 0,
+        initialMinute = task.time?.rem(60) ?: 0
+    )
 
     // notification permission
     val context = LocalContext.current
@@ -149,7 +155,7 @@ fun ModalDateTimeSheet(
         }
 
         if (openTimerPicker) {
-            OpenTimerPicker(task = task, updateTimerPicker = {openTimerPicker = it}, onSelectTime = {selectedTime = it})
+            OpenTimerPicker(timePickerState, updateTimerPicker = {openTimerPicker = it}, onSelectTime = {selectedTime = it})
         }
     }
 }
