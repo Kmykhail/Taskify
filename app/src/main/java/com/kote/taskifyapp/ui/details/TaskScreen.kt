@@ -15,13 +15,14 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Flag
+import androidx.compose.material.icons.outlined.NearMe
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -35,6 +36,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.ui.components.CustomTextField
@@ -64,7 +66,7 @@ fun TaskScreen(
         modifier = modifier
             .padding(horizontal = 16.dp, vertical = 10.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(color = Color.White)
+            .background(color = MaterialTheme.colorScheme.surfaceContainer)
     ) {
         CustomTextField(
             value = task.title ?: "",
@@ -110,8 +112,6 @@ fun TaskScreen(
                 task = task,
                 openDatTimeSheet = openDatTimeSheet,
                 openPrioritySelector = openPrioritySelector,
-                getTaskCalendarColor = viewModel::getTaskCalendarColor,
-                getTaskPriorityColor = viewModel::getTaskPriorityColor,
                 updateTaskPriority = viewModel::updateTaskPriority,
                 onDeleteTask = {
                     viewModel.deleteTask()
@@ -149,11 +149,11 @@ private fun ShowCompletedBar(
         IconButton(
             onClick = onRestoreClick,
             enabled = !task.title.isNullOrEmpty() || !task.description.isNullOrEmpty()
-        ) { Icon(imageVector = Icons.Default.Restore, contentDescription = "Restore task") }
+        ) { Icon(imageVector = Icons.Default.Restore, contentDescription = "Restore task", tint = MaterialTheme.colorScheme.primary) }
         IconButton(
             onClick = onDeleteClick,
             enabled = task.isCreated
-        ) { Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete task") }
+        ) { Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete task", tint = MaterialTheme.colorScheme.primary) }
     }
     Text(
         text = "This task will be deleted in ${TimeUnit.MILLISECONDS.toDays(task.deletionTime!! - System.currentTimeMillis())} day",
@@ -166,8 +166,6 @@ private fun ShowIncompleteBar(
     task: Task,
     openDatTimeSheet: MutableState<Boolean>,
     openPrioritySelector: MutableState<Boolean>,
-    getTaskCalendarColor: () -> Color,
-    getTaskPriorityColor: () -> Color,
     updateTaskPriority: (Priority) -> Unit,
     onDeleteTask: () -> Unit,
     onSaveTask: () -> Unit,
@@ -177,29 +175,43 @@ private fun ShowIncompleteBar(
         horizontalArrangement = Arrangement.Start
     ) {
         IconButton(onClick = {openDatTimeSheet.value = !openDatTimeSheet.value}) {
-            Icon(imageVector = Icons.Outlined.CalendarMonth, contentDescription = "Set day and time", tint = getTaskCalendarColor())
+            Icon(
+                imageVector = Icons.Outlined.CalendarMonth,
+                contentDescription = "Set day and time",
+                tint = if (task.date != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+            )
         }
         Box {
             IconButton(onClick = {openPrioritySelector.value = !openPrioritySelector.value}) {
-                Icon(imageVector = Icons.Outlined.Flag, contentDescription = "Set priority", tint = getTaskPriorityColor())
+                Icon(
+                    imageVector = Icons.Filled.Flag,
+                    contentDescription = "Set priority",
+                    tint = when (task.priority) {
+                        Priority.High -> Color.Red
+                        Priority.Medium -> Color.Yellow
+                        Priority.Low -> Color.Green
+                        Priority.NoPriority -> MaterialTheme.colorScheme.outline
+                    }
+                )
+
             }
             if (openPrioritySelector.value) {
                 PriorityMenu(onDismissRequest = {openPrioritySelector.value = it}, onPriorityChange = updateTaskPriority)
             }
         }
-        IconButton(
-            onClick = onDeleteTask,
-            enabled = task.isCreated
-        ) { Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete task") }
+        IconButton(onClick = onDeleteTask) {
+            Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete task", tint = MaterialTheme.colorScheme.outline)
+        }
         Spacer(modifier = Modifier.weight(1f))
-        IconButton(
-            onClick = onSaveTask,
-            enabled = !task.title.isNullOrEmpty() || !task.description.isNullOrEmpty()
-        ) {
-            Icon(
-                imageVector = Icons.Default.Done,
-                contentDescription = "Create/update task"
-            )
+        if (!task.title.isNullOrEmpty() || !task.description.isNullOrEmpty()) {
+            IconButton(onClick = onSaveTask) {
+                Icon(
+                    imageVector = Icons.Outlined.NearMe,
+                    contentDescription = "Create/update task",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.graphicsLayer(rotationZ = -315f)
+                )
+            }
         }
     }
 }

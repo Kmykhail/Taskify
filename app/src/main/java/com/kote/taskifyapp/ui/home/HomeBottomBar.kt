@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
@@ -35,7 +36,7 @@ fun HomeBottomBar(
             Icon(
                 imageVector = Icons.Filled.DashboardCustomize,
                 contentDescription = "Home",
-                tint = if (clickableScreen.value == UserHomeScreens.TASKS) Color.Blue else Color.Gray,
+                tint = if (clickableScreen.value == UserHomeScreens.TASKS) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                 modifier = Modifier.size(26.dp)
             )
         }
@@ -48,7 +49,7 @@ fun HomeBottomBar(
             Icon(
                 imageVector = Icons.Default.Today,
                 contentDescription = "Calendar",
-                tint = if (clickableScreen.value == UserHomeScreens.CALENDAR) Color.Blue else Color.Gray,
+                tint = if (clickableScreen.value == UserHomeScreens.CALENDAR) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                 modifier = Modifier.size(26.dp)
             )
         }
@@ -58,7 +59,7 @@ fun HomeBottomBar(
             Icon(
                 imageVector = Icons.Default.Settings,
                 contentDescription = "Settings",
-                tint = if (clickableScreen.value == UserHomeScreens.SETTINGS) Color.Blue else Color.Gray,
+                tint = if (clickableScreen.value == UserHomeScreens.SETTINGS) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                 modifier = Modifier.size(26.dp)
             )
         }

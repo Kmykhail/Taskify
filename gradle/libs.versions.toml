@@ -20,6 +20,7 @@ materialIconsExtendedAndroid = "1.7.6"
 navigationCommon = "2.8.5"
 roomRuntime = "2.6.1"
 workRuntimeKtx = "2.10.0"
+uiTextGoogleFonts = "1.7.8"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -62,6 +63,7 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 material = { module = "com.google.android.material:material", version.ref = "material" }
 mockito-core = { module = "org.mockito:mockito-core" }
 mockk = { module = "io.mockk:mockk" }
+androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
