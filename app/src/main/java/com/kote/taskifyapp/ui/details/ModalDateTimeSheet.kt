@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.TextButton
+import androidx.compose.material3.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
@@ -45,7 +45,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.kote.taskifyapp.data.Priority
 import com.kote.taskifyapp.data.Task
 import com.kote.taskifyapp.ui.components.OpenTimerPicker
 import com.kote.taskifyapp.ui.components.ShowPermissionDialog
@@ -58,7 +57,6 @@ fun ModalDateTimeSheet(
     onTimeChange: (Int?) -> Unit,
     removeReminder: (id: Int) -> Unit,
     onDismissRequest: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
 ) {
     // datePicker
     val datePickerState = rememberDatePickerState(
@@ -103,9 +101,7 @@ fun ModalDateTimeSheet(
                 onDismissRequest(false)
                 datePickerState.selectedDateMillis = System.currentTimeMillis()
                 selectedTime = null
-            }) {
-                Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
-            }
+            }) { Icon(imageVector = Icons.Default.Close, contentDescription = "Close") }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = {
                 onDateChange(datePickerState.selectedDateMillis)
@@ -148,6 +144,7 @@ fun ModalDateTimeSheet(
                     if (selectedTime != null) {
                         Text(text = String.format("%02d:%02d", selectedTime!! / 60, selectedTime!!  % 60))
                         IconButton(onClick = {
+                            selectedTime = null
                             onTimeChange(null)
                             removeReminder(task.id)
                         }) { Icon(imageVector = Icons.Default.Close, contentDescription = "Remove reminder") }

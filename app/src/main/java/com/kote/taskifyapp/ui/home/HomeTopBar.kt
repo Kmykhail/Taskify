@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.kote.taskifyapp.data.SortType
 import kotlinx.coroutines.delay
 
 @Composable
@@ -94,21 +95,21 @@ fun HomeTopBar(
                 DropdownMenuItem(
                     text = { Text("Sort by title") },
                     onClick = {
-                        onSortChange(SortType.TITLE)
+                        onSortChange(SortType.Title)
                         expanded = false
                     }
                 )
                 DropdownMenuItem(
                     text = { Text("Sort by date") },
                     onClick = {
-                        onSortChange(SortType.DATE)
+                        onSortChange(SortType.Date)
                         expanded = false
                     }
                 )
                 DropdownMenuItem(
                     text = { Text("Sort by priority") },
                     onClick = {
-                        onSortChange(SortType.PRIORITY)
+                        onSortChange(SortType.Priority)
                         expanded = false
                     }
                 )

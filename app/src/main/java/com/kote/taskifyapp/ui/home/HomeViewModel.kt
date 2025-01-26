@@ -3,14 +3,18 @@ package com.kote.taskifyapp.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kote.taskifyapp.DELAY_FOR_DELETE
+import com.kote.taskifyapp.data.SortType
 import com.kote.taskifyapp.data.Task
 import com.kote.taskifyapp.data.repository.TaskRepository
+import com.kote.taskifyapp.data.repository.UserPreferencesRepository
 import com.kote.taskifyapp.data.repository.WorkManagerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -18,25 +22,29 @@ import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
 
-enum class SortType {
-    TITLE, DATE, PRIORITY
-}
-
 enum class GroupTasksType {
-    ALL, TODAY, PLANNED, COMPLETED, IMPORTANT
+    ALL,
+    TODAY,
+    PLANNED,
+    COMPLETED;
+
+    companion object {
+        fun fromInt(value: Int) = enumValues<GroupTasksType>().getOrNull(value) ?: ALL
+    }
 }
 
 data class TasksUiState(
     val groupTasksType: GroupTasksType = GroupTasksType.ALL,
-    val sortType: SortType = SortType.DATE,
+    val sortType: SortType = SortType.Date,
 )
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: TaskRepository,
-    private val workRepository: WorkManagerRepository
+    private val workRepository: WorkManagerRepository,
+    private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
-    private val _tasksUiState = MutableStateFlow(TasksUiState())
+    private val _tasksUiState = MutableStateFlow<TasksUiState?>(null)
     val tasksUiState = _tasksUiState.asStateFlow()
 
     private val _groupedTasks = MutableStateFlow(emptyMap<String, List<Task>>())
@@ -44,12 +52,27 @@ class HomeViewModel @Inject constructor(
 
     init {
         workRepository.scheduleDailyCheck()
+
         viewModelScope.launch {
-            repository.allTask.combine(_tasksUiState) { tasks, uiState ->
+            val initialType = userPreferencesRepository.groupTaskTypeFlow.first()
+            _tasksUiState.value = TasksUiState(groupTasksType = initialType)
+
+            userPreferencesRepository.groupTaskTypeFlow.collect { savedGroupType ->
+                _tasksUiState.update { it?.copy(groupTasksType = savedGroupType) }
+            }
+        }
+
+        viewModelScope.launch {
+            repository.allTask.combine(_tasksUiState.filterNotNull()) { tasks, uiState ->
                 val currentDate = LocalDate.now()
+                val sortedTasks = when (uiState.sortType) {
+                    SortType.Title -> tasks.sortedBy { it.title }
+                    SortType.Date -> tasks.sortedBy { it.date ?: Long.MAX_VALUE }
+                    SortType.Priority -> tasks.sortedBy { it.priority }
+                }
                 when (uiState.groupTasksType) {
                     GroupTasksType.ALL -> {
-                        tasks.groupBy {
+                        sortedTasks.groupBy {
                             when {
                                 it.isCompleted -> "Completed"
                                 it.date != null && convertMillisToDate(it.date) < currentDate -> "Outdated"
@@ -59,7 +82,7 @@ class HomeViewModel @Inject constructor(
                         }
                     }
                     GroupTasksType.TODAY -> {
-                        tasks.filter { it.date != null && convertMillisToDate(it.date) <= currentDate }
+                        sortedTasks.filter { it.date != null && convertMillisToDate(it.date) <= currentDate }
                             .groupBy {
                                 when {
                                     it.isCompleted -> "Completed"
@@ -69,15 +92,12 @@ class HomeViewModel @Inject constructor(
                             }
                     }
                     GroupTasksType.COMPLETED -> {
-                        mapOf("Completed" to tasks.filter { it.isCompleted })
+                        mapOf("Completed" to sortedTasks.filter { it.isCompleted })
                     }
                     GroupTasksType.PLANNED -> {
-                        mapOf("Planned" to tasks.filter {
+                        mapOf("Planned" to sortedTasks.filter {
                             it.date != null && !it.isCompleted && convertMillisToDate(it.date) >= currentDate
                         })
-                    }
-                    GroupTasksType.IMPORTANT -> {
-                        mapOf("Important" to tasks.filter { it.isFavorite })
                     }
                 }
             }
@@ -87,10 +107,15 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun setSortType(sortType: SortType) { _tasksUiState.update { it.copy(sortType = sortType) }}
+    fun cancelDailyCheck() {
+        workRepository.cancelDailyCheck()
+    }
 
-    fun setGroupTasksType(groupTasksType: GroupTasksType) {
-        _tasksUiState.update { it.copy(groupTasksType = groupTasksType) }
+    fun setSortType(sortType: SortType) { _tasksUiState.update { it?.copy(sortType = sortType) }}
+
+    fun setGroupTasksType(newType: GroupTasksType) {
+        _tasksUiState.update { it?.copy(groupTasksType = newType) }
+        viewModelScope.launch { userPreferencesRepository.saveGroupTaskType(newType) }
     }
 
     fun deleteSelectedTasks(selectedTaskIds: Set<Int>) {
@@ -114,6 +139,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
     private fun convertMillisToDate(date: Long): LocalDate {
         return Instant.ofEpochMilli(date)
             .atZone(ZoneId.systemDefault())
