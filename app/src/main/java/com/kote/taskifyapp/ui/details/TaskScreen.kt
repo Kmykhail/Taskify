@@ -194,9 +194,9 @@ private fun ShowIncompleteBar(
                     imageVector = Icons.Filled.Flag,
                     contentDescription = "Set priority",
                     tint = when (task.priority) {
-                        Priority.High -> Color.Red
-                        Priority.Medium -> Color.Yellow
-                        Priority.Low -> Color.Green
+                        Priority.High -> Color(0xFFAF2A2A)
+                        Priority.Medium -> Color(0xFFE0B83D)
+                        Priority.Low -> Color(0xFF93C47D)
                         Priority.NoPriority -> MaterialTheme.colorScheme.outline
                     }
                 )

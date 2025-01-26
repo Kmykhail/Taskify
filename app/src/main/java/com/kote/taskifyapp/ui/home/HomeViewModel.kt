@@ -103,7 +103,7 @@ class HomeViewModel @Inject constructor(
                         sortedGroupedTasks[group] = when(uiState.sortType) {
                             SortType.Title -> taskList.sortedBy { it.title?.lowercase() }
                             SortType.Date -> taskList.sortedBy { it.date }
-                            SortType.Priority -> taskList.sortedBy { it.priority }
+                            SortType.Priority -> taskList.sortedByDescending { it.priority }
                         }
                     }
                 }
