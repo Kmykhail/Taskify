@@ -17,17 +17,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessAlarms
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DisplayMode
@@ -37,8 +32,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTimePickerState
@@ -51,18 +44,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.kote.taskifyapp.R
 import com.kote.taskifyapp.data.ReminderType
 import com.kote.taskifyapp.data.Task
 import com.kote.taskifyapp.ui.components.ShowPermissionDialog
+import com.kote.taskifyapp.ui.components.ShowReminderDialog
+import com.kote.taskifyapp.ui.components.TimerPickerDialog
 import java.time.LocalDate
 import java.time.ZoneOffset
 
@@ -297,88 +290,7 @@ private fun ReminderRow(
 }
 
 @Composable
-private fun TimerPickerDialog(
-    timePickerState: TimePickerState,
-    onConfirmation: () -> Unit,
-    onDismissRequest: () -> Unit
-) {
-    Dialog(onDismissRequest = onDismissRequest) {
-        Card(shape = RoundedCornerShape(16.dp)) {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .wrapContentSize()
-                    .padding(top = 16.dp)
-            ) {
-                TimePicker(state = timePickerState)
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    TextButton(
-                        onClick = { onDismissRequest() },
-                        modifier = Modifier.padding(8.dp),
-                    ) {Text(stringResource(R.string.alert_time_picker_dismiss))}
-                    TextButton(
-                        onClick = { onConfirmation() },
-                        modifier = Modifier.padding(8.dp),
-                    ) {Text(stringResource(R.string.alert_ok))}
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ShowReminderDialog(
-    reminderType: ReminderType,
-    onConfirmation: (ReminderType) -> Unit,
-    onDismissRequest: () -> Unit
-) {
-    var selectedType by remember { mutableStateOf(reminderType) }
-    val reminderTypeOptions = mapOf(ReminderType.None to stringResource(R.string.none), ReminderType.OnTime to stringResource(R.string.on_time))
-
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        title = { Text(stringResource(R.string.alert_reminder_title)) },
-        dismissButton = { Button(onClick = { onDismissRequest() }) { Text(stringResource(R.string.alert_reminder_dismiss)) } },
-        confirmButton = {
-            Button(
-                onClick = { onConfirmation(selectedType) }
-            ) { Text(stringResource(R.string.alert_ok)) }
-        },
-        text = {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                reminderTypeOptions.forEach { (k, v) ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .clickable {
-                                selectedType = k
-                            }
-                            .padding(vertical = 10.dp)
-                    ) {
-                        Text(text = v, style = MaterialTheme.typography.bodyLarge)
-                        Spacer(modifier = Modifier.weight(1f))
-                        Icon(
-                            imageVector = Icons.Default.Done,
-                            contentDescription = null,
-                            tint = if (selectedType == k) MaterialTheme.colorScheme.primary else Color.Transparent
-                        )
-                    }
-                }
-            }
-        }
-    )
-}
-
-@Composable
-fun TopSheetBar(
+private fun TopSheetBar(
     onCloseClick: () -> Unit,
     onApplyClick: () -> Unit,
 ) {
