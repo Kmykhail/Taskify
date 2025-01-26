@@ -5,49 +5,46 @@ import androidx.lifecycle.viewModelScope
 import com.kote.taskifyapp.data.Task
 import com.kote.taskifyapp.data.repository.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+enum class SortType {
+    TITLE, DATE, PRIORITY
+}
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: TaskRepository
 ) : ViewModel() {
+    private val _sortType = MutableStateFlow(SortType.DATE)
 
-    val tasks: StateFlow<List<Task>> = repository.allTask.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
-
-//    init {
-//        if (!taskId.isNullOrEmpty()) {
-////            _dummyTask.value = repository.getTaskById(taskId = taskId.toInt())
-//            viewModelScope.launch {
-//                tasks.collect { taskList ->
-//                    Log.d("Debug", "taskId: ${taskId}, task size ${taskList.size}")
-//                    taskList.forEach {
-//                        if (it.id == taskId.toInt()) {
-//                            _dummyTask.value = it
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-
-    private fun createTask(task: Task) {
-        viewModelScope.launch {
-            repository.insertTask(task)
+    val tasks: StateFlow<List<Task>> = repository.allTask
+        .combine(_sortType) { tasks, sortType ->
+            when (sortType) {
+                SortType.TITLE -> tasks.sortedBy { it.title }
+                SortType.DATE -> tasks.sortedBy { it.date }
+                SortType.PRIORITY -> tasks.sortedBy { it.priority }
+            }
         }
-    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
-    private fun updateTask(task: Task) {
+    fun setSortType(sortType: SortType) { _sortType.value = sortType }
+
+    fun markAsCompleted(taskId: Int) {
         viewModelScope.launch {
-            repository.updateTask(task)
+            tasks.value.find { it.id == taskId }?.let {
+                val updated = it.copy(isCompleted = true)
+                repository.updateTask(updated)
+            }
         }
     }
 }

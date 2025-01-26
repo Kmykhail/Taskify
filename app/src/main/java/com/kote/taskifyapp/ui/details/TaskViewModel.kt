@@ -1,6 +1,5 @@
 package com.kote.taskifyapp.ui.details
 
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -23,19 +22,16 @@ class TaskViewModel @Inject constructor(
     private val repository: TaskRepository,
     private val reminderRepository: ReminderManagerRepository
 ) : ViewModel() {
-    private val taskId: String? = savedStateHandle["taskId"]
 
     private val _taskState = MutableStateFlow<Task>(Task())
     val taskState : StateFlow<Task> = _taskState
 
-    private var isDateChosen = false
-    private var isTimeChosen = false
-
     init {
         viewModelScope.launch {
+            val taskId: String? = savedStateHandle["taskId"]
             if (!taskId.isNullOrEmpty()) {
                 repository.getAllTasks().collect{ tasks ->
-                    tasks.firstOrNull{ it.id== taskId.toInt() }?.let { _taskState.value = it }
+                    tasks.firstOrNull{ it.id == taskId.toInt() }?.let { _taskState.value = it }
                 }
             }
         }
@@ -44,28 +40,22 @@ class TaskViewModel @Inject constructor(
     fun saveTask() {
         viewModelScope.launch {
             _taskState.value.run {
-                Log.d("Debug", "check $isDateChosen, $isTimeChosen, $isCompleted")
-                if (isDateChosen && isTimeChosen && !isCompleted) {
-                    reminderRepository.scheduleNotification(
-                        id,
-                        title,
-                        description,
-                        calculateReminderTime(date!!, time!!)
-                    )
+                if (date != null && time != null) {
+                    reminderRepository.scheduleNotification(id, title, description, calculateReminderTime(date, time))
                 }
-            }
-
-            if (!taskId.isNullOrEmpty()) {
-                repository.updateTask(_taskState.value)
-            } else {
-                repository.insertTask(_taskState.value)
+                if (isCreated) {
+                    repository.updateTask(_taskState.value)
+                } else {
+                    _taskState.update { it.copy(isCreated = true) }
+                    repository.insertTask(_taskState.value)
+                }
             }
         }
     }
 
     fun deleteTask() {
         viewModelScope.launch {
-            if (!taskId.isNullOrEmpty()) {
+            if (_taskState.value.isCreated) {
                 removeReminder(_taskState.value.id)
                 repository.deleteTask(_taskState.value)
             }
@@ -100,7 +90,6 @@ class TaskViewModel @Inject constructor(
     fun updateTaskDate(date: Long?) {
         date?.let {
             if (_taskState.value.date != date) {
-                isDateChosen = true
                 _taskState.update { it.copy(date = date) }
             }
         }
@@ -109,7 +98,6 @@ class TaskViewModel @Inject constructor(
     fun updateTaskTime(time: Int?) {
         time?.let {
             if (_taskState.value.time != time) {
-                isTimeChosen = true
                 _taskState.update { it.copy(time = time) }
             }
         }

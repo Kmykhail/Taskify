@@ -94,9 +94,10 @@ fun TaskScreen(
                 onClick = {
                     viewModel.deleteTask()
                     navigateBack()
-                }
+                },
+                enabled = task.isCreated
             ) {
-                Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete")
+                Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete task")
             }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(

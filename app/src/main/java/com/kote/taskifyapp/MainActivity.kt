@@ -7,9 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.kote.taskifyapp.ui.navigation.TaskifyNavGraph
 import com.kote.taskifyapp.ui.theme.TaskifyTheme
@@ -22,7 +20,6 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContent {
             TaskifyTheme {
-//                val viewModel = hiltViewModel<HomeViewModel>()
                 Scaffold(
                     modifier = Modifier
                         .fillMaxSize()
@@ -34,13 +31,5 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TaskifyTheme {
-//        Greeting("Android")
     }
 }
