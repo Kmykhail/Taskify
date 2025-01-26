@@ -56,10 +56,6 @@ class HomeViewModel @Inject constructor(
     fun setSortType(sortType: SortType) { _tasksUiState.update { it.copy(sortType = sortType) }}
     fun setFilterType(filterType: FilterType) { _tasksUiState.update { it.copy(filterType = filterType) } }
 
-    fun getNumberActiveTasks(): Int {
-        return tasks.value.count { !it.isCompleted }
-    }
-
     fun deleteAllTasks() {
         viewModelScope.launch {
             tasks.value.forEach { task ->
