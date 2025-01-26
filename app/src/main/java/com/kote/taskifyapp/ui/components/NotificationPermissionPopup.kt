@@ -10,7 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-fun ShowNotificationDialog(
+fun ShowPermissionDialog(
     ctx: Context,
     onDismissDialog: (Boolean) -> Unit
 ) {

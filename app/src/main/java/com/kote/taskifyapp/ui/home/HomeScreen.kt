@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 fun HomeScreen(
     viewModel: HomeViewModel,
     onNavigateToTaskDetails: (String) -> Unit,
+    onNavigateToSelectionScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val tasks by viewModel.tasks.collectAsState()
@@ -65,6 +66,7 @@ fun HomeScreen(
             tasks = tasks,
             tasksUiState = tasksUiState,
             onNavigateToTaskDetails = onNavigateToTaskDetails,
+            onNavigateToSelectionScreen = onNavigateToSelectionScreen,
             markAsCompleted = viewModel::markAsCompleted,
             paddingValues = paddingValues
         )

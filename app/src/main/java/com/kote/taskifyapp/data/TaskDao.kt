@@ -10,11 +10,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TaskDao {
-    // create
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTask(task: Task)
 
-    // read
     @Query("SELECT * FROM tasks WHERE id = :taskId")
     suspend fun getTaskById(taskId: Int): Task?
 
@@ -27,11 +25,12 @@ interface TaskDao {
     @Query("DELETE FROM tasks")
     suspend fun deleteAllTasks()
 
-    // update
     @Update
     suspend fun updateTask(task: Task)
 
-    // delete
     @Delete
     suspend fun deleteTask(task: Task)
+
+    @Query("DELETE FROM tasks WHERE id IN (:taskIds)")
+    suspend fun deleteSpecificTasks(taskIds: Set<Int>)
 }

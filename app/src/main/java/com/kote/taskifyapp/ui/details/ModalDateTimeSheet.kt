@@ -42,7 +42,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.kote.taskifyapp.data.Task
 import com.kote.taskifyapp.ui.components.OpenTimerPicker
-import com.kote.taskifyapp.ui.components.ShowNotificationDialog
+import com.kote.taskifyapp.ui.components.ShowPermissionDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -145,7 +145,7 @@ fun ModalDateTimeSheet(
         }
 
         if (showPermissionDialog) {
-            ShowNotificationDialog(ctx = context, onDismissDialog = {showPermissionDialog = it})
+            ShowPermissionDialog(ctx = context, onDismissDialog = {showPermissionDialog = it})
         }
 
         if (openTimerPicker) {

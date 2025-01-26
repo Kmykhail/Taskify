@@ -71,6 +71,12 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun deleteSelectedTasks(selectedTaskIds: Set<Int>) {
+        viewModelScope.launch {
+            repository.deleteSpecificTasks(selectedTaskIds)
+        }
+    }
+
     fun markAsCompleted(taskId: Int) {
         viewModelScope.launch {
             tasks.value.find { it.id == taskId}?.let {
