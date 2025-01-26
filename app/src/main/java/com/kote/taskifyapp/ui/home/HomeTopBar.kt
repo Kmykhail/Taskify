@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.Task
+import androidx.compose.material.icons.outlined.Task
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -24,10 +26,13 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun HomeTopBar(
     onSortChange: (SortType) -> Unit,
+    onFiltrationChange: (FilterType) -> Unit,
     onSwitchView: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var filterSwitcher by remember { mutableStateOf(FilterType.INCOMPLETED) }
     var expanded by remember { mutableStateOf(false) } // State to manage dropdown visibility
+
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -53,6 +58,31 @@ fun HomeTopBar(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
+                if (filterSwitcher == FilterType.INCOMPLETED) {
+                    DropdownMenuItem(
+                        text = { Text("Show completed") },
+                        leadingIcon = {
+                            Icon(imageVector = Icons.Filled.Task, contentDescription = "Show ALL tasks")
+                        },
+                        onClick = {
+                            filterSwitcher = FilterType.ALL
+                            onFiltrationChange(filterSwitcher)
+                            expanded = false
+                        }
+                    )
+                } else {
+                    DropdownMenuItem(
+                        text = { Text("Hide completed") },
+                        leadingIcon = {
+                            Icon(imageVector = Icons.Outlined.Task, contentDescription = "Show COMPLETED tasks")
+                        },
+                        onClick = {
+                            filterSwitcher = FilterType.INCOMPLETED
+                            onFiltrationChange(filterSwitcher)
+                            expanded = false
+                        }
+                    )
+                }
                 DropdownMenuItem(
                     text = { Text("Sort by title") },
                     onClick = {
