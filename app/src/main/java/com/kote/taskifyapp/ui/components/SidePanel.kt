@@ -23,31 +23,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import com.kote.taskifyapp.ui.home.TaskFilterType
+import com.kote.taskifyapp.ui.home.GroupTasksType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 data class SidePanelItem(
     val name: String,
     val icon: ImageVector,
-    val sidePanelOptions: TaskFilterType
+    val sidePanelOptions: GroupTasksType
 )
 
 @Composable
 fun SidePanel(
     drawerState: DrawerState,
     scope: CoroutineScope,
-    selectedFilterType: TaskFilterType,
-    onSelectedFilterType: (TaskFilterType) -> Unit,
+    selectedFilterType: GroupTasksType,
+    onSelectedFilterType: (GroupTasksType) -> Unit,
     modifier: Modifier,
     content: @Composable () -> Unit
 ) {
     val items = listOf(
-        SidePanelItem("All", Icons.Default.ContentCopy, TaskFilterType.ALL),
-        SidePanelItem("Today", Icons.Outlined.Today, TaskFilterType.TODAY),
-        SidePanelItem("Planned", Icons.Outlined.AccessTime, TaskFilterType.PLANNED),
-        SidePanelItem("Completed", Icons.Default.DoneAll, TaskFilterType.COMPLETED),
-//        SidePanelItem("Important", Icons.Outlined.StarOutline, TaskFilterType.IMPORTANT),
+        SidePanelItem("All", Icons.Default.ContentCopy, GroupTasksType.ALL),
+        SidePanelItem("Today", Icons.Outlined.Today, GroupTasksType.TODAY),
+        SidePanelItem("Planned", Icons.Outlined.AccessTime, GroupTasksType.PLANNED),
+        SidePanelItem("Completed", Icons.Default.DoneAll, GroupTasksType.COMPLETED),
+        SidePanelItem("Important", Icons.Outlined.StarOutline, GroupTasksType.IMPORTANT),
     )
 
     ModalNavigationDrawer(

@@ -15,8 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,10 +24,6 @@ import com.kote.taskifyapp.ui.components.SidePanel
 import com.kote.taskifyapp.ui.navigation.UserHomeScreens
 import kotlinx.coroutines.launch
 
-enum class SidePanelOptions {
-    ALL, TODAY, PLANNED, COMPLETED, IMPORTANT
-}
-
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
@@ -38,7 +32,7 @@ fun HomeScreen(
     onNavigateToSelectionScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val tasks by viewModel.tasks.collectAsState()
+    val groupedTasks by viewModel.groupedTask.collectAsState()
     val tasksUiState by viewModel.tasksUiState.collectAsState()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -47,17 +41,17 @@ fun HomeScreen(
     SidePanel(
         drawerState = drawerState,
         scope = scope,
-        selectedFilterType = tasksUiState.taskFilterType,
-        onSelectedFilterType = viewModel::setFilterType,
+        selectedFilterType = tasksUiState.groupTasksType,
+        onSelectedFilterType = viewModel::setGroupTasksType,
         modifier = modifier
     ) {
         Scaffold(
             topBar = {
                 if (userHomeScreens.value == UserHomeScreens.TASKS) {
                     HomeTopBar(
-                        taskFilterType = tasksUiState.taskFilterType,
+                        groupTasksType = tasksUiState.groupTasksType,
                         onSortChange = viewModel::setSortType,
-                        onFiltrationChange = viewModel::setFilterType,
+                        onFiltrationChange = viewModel::setGroupTasksType,
                         onSwitchView = {},
                         onOpenSidePanel = { scope.launch { drawerState.open() } },
                         modifier = modifier
@@ -69,6 +63,7 @@ fun HomeScreen(
             bottomBar = {
                 HomeBottomBar(
                     clickableScreen = userHomeScreens,
+                    onCalendarGroupChange = {viewModel.setGroupTasksType(GroupTasksType.ALL)},
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp, bottom = 24.dp, start = 32.dp, end = 32.dp)
@@ -94,18 +89,17 @@ fun HomeScreen(
             when (userHomeScreens.value) {
                 UserHomeScreens.TASKS -> {
                     HomeListView(
-                        tasks = tasks,
-                        tasksUiState = tasksUiState,
+                        groupedTasks = groupedTasks,
                         onNavigateToTaskDetails = onNavigateToTaskDetails,
                         onNavigateToSelectionScreen = onNavigateToSelectionScreen,
                         markAsCompleted = viewModel::markAsCompleted,
+                        groupTasksType = tasksUiState.groupTasksType,
                         paddingValues = paddingValues
                     )
                 }
                 UserHomeScreens.CALENDAR -> {
                     CustomCalendarView(
-                        tasks = tasks,
-                        tasksUiState = tasksUiState,
+                        groupedTasks = groupedTasks,
                         onSelectedDate = {selectedDate = it},
                         onNavigateToTaskDetails = onNavigateToTaskDetails,
                         markAsCompleted = viewModel::markAsCompleted,

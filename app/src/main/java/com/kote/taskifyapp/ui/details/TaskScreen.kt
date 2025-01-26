@@ -19,6 +19,7 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,6 +35,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.ui.components.CustomTextField
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.style.TextAlign
+import com.kote.taskifyapp.data.Task
+import java.util.concurrent.TimeUnit
 
 @Composable
 fun TaskScreen(
@@ -79,25 +83,17 @@ fun TaskScreen(
                 .focusRequester(focusRequester2)
         )
         if (task.isCompleted) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                IconButton(
-                    onClick = {
-                        viewModel.restoreTask()
-                        navigateBack()
-                    },
-                    enabled = !task.title.isNullOrEmpty() || !task.description.isNullOrEmpty()
-                ) { Icon(imageVector = Icons.Default.Restore, contentDescription = "Restore task") }
-                IconButton(
-                    onClick = {
-                        viewModel.deleteTask()
-                        navigateBack()
-                    },
-                    enabled = task.isCreated
-                ) { Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete task") }
-            }
+            ShowCompletedScenario(
+                task = task,
+                onRestoreClick = {
+                    viewModel.restoreTask()
+                    navigateBack()
+                },
+                onDeleteClick = {
+                    viewModel.deleteTask()
+                    navigateBack()
+                }
+            )
         } else {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -147,4 +143,29 @@ fun TaskScreen(
             onDismissRequest = {openDatTimeSheet = it}
         )
     }
+}
+
+@Composable
+private fun ShowCompletedScenario(
+    task: Task,
+    onRestoreClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        IconButton(
+            onClick = onRestoreClick,
+            enabled = !task.title.isNullOrEmpty() || !task.description.isNullOrEmpty()
+        ) { Icon(imageVector = Icons.Default.Restore, contentDescription = "Restore task") }
+        IconButton(
+            onClick = onDeleteClick,
+            enabled = task.isCreated
+        ) { Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete task") }
+    }
+    Text(
+        text = "This task will be deleted in ${TimeUnit.MILLISECONDS.toDays(task.deletionTime!! - System.currentTimeMillis())} day",
+        textAlign = TextAlign.Justify
+    )
 }
