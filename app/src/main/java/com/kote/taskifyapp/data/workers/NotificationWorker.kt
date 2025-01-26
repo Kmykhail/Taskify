@@ -1,4 +1,4 @@
-package com.kote.taskifyapp.data.worker
+package com.kote.taskifyapp.data.workers
 
 import android.Manifest
 import android.app.Notification
@@ -22,7 +22,7 @@ import com.kote.taskifyapp.KEY_TITLE
 import com.kote.taskifyapp.MainActivity
 import com.kote.taskifyapp.R
 
-class ReminderWorker(
+class NotificationWorker(
     private val ctx: Context,
     params: WorkerParameters
 ) : CoroutineWorker(ctx, params) {

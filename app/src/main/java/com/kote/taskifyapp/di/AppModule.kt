@@ -17,7 +17,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideTaskDatabase(app: Application) : TaskDatabase {
-        return TaskDatabase.gerDataBase(app.applicationContext)
+        return TaskDatabase.getDataBase(app.applicationContext)
     }
 
     @Provides
