@@ -21,8 +21,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.kote.taskifyapp.R
 import com.kote.taskifyapp.data.SortType
 import kotlinx.coroutines.delay
 
@@ -93,28 +95,28 @@ fun HomeTopBar(
 //                    )
 //                }
                 DropdownMenuItem(
-                    text = { Text("Sort by title") },
+                    text = { Text(stringResource(R.string.title_sort)) },
                     onClick = {
                         onSortChange(SortType.Title)
                         expanded = false
                     }
                 )
                 DropdownMenuItem(
-                    text = { Text("Sort by date") },
+                    text = { Text(stringResource(R.string.date_sort)) },
                     onClick = {
                         onSortChange(SortType.Date)
                         expanded = false
                     }
                 )
                 DropdownMenuItem(
-                    text = { Text("Sort by priority") },
+                    text = { Text(stringResource(R.string.priority_sort)) },
                     onClick = {
                         onSortChange(SortType.Priority)
                         expanded = false
                     }
                 )
                 DropdownMenuItem(
-                    text = { Text("View") },
+                    text = { Text("View") }, // TODO remove to settings
                     onClick = {
                         onSwitchView()
                         expanded = false

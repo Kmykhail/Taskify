@@ -1,7 +1,6 @@
 package com.kote.taskifyapp.ui.details
 
 import android.util.Log
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,9 +15,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.ZoneOffset
-import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
@@ -116,9 +112,5 @@ class TaskViewModel @Inject constructor(
 
     fun updateTaskPriority(priority: Priority) {
         _taskState.update { it.copy(priority = priority) }
-    }
-
-    private fun convertDateToMillis(dateString: String): Long {
-        return LocalDate.parse(dateString).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
     }
 }

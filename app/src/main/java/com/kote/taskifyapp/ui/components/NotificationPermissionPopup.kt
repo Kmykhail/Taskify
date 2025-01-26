@@ -8,6 +8,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.kote.taskifyapp.R
 
 @Composable
 fun ShowPermissionDialog(
@@ -34,7 +36,7 @@ fun ShowPermissionDialog(
                     }
                     ctx.startActivity(intent)
                 }
-            ) { Text("Settings") }
+            ) { Text(stringResource(R.string.notification_pop_button_text)) }
         }
     )
 }

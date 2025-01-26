@@ -22,7 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kote.taskifyapp.R
 import com.kote.taskifyapp.ui.home.GroupTasksType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -44,10 +46,10 @@ fun SidePanel(
     content: @Composable () -> Unit
 ) {
     val items = listOf(
-        SidePanelItem("All", Icons.Default.ContentCopy, GroupTasksType.ALL),
-        SidePanelItem("Today", Icons.Outlined.Today, GroupTasksType.TODAY),
-        SidePanelItem("Planned", Icons.Outlined.AccessTime, GroupTasksType.PLANNED),
-        SidePanelItem("Completed", Icons.Default.DoneAll, GroupTasksType.COMPLETED)
+        SidePanelItem(stringResource(R.string.side_panel_all), Icons.Default.ContentCopy, GroupTasksType.ALL),
+        SidePanelItem(stringResource(R.string.side_panel_today), Icons.Outlined.Today, GroupTasksType.TODAY),
+        SidePanelItem(stringResource(R.string.side_panel_planned), Icons.Outlined.AccessTime, GroupTasksType.PLANNED),
+        SidePanelItem(stringResource(R.string.side_panel_completed), Icons.Default.DoneAll, GroupTasksType.COMPLETED)
     )
 
     ModalNavigationDrawer(
