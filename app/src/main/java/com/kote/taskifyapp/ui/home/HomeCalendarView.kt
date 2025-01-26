@@ -1,4 +1,4 @@
-package com.kote.taskifyapp.ui.components
+package com.kote.taskifyapp.ui.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,8 +37,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.data.Task
-import com.kote.taskifyapp.ui.home.HomeListView
-import com.kote.taskifyapp.ui.home.TasksUiState
 import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth

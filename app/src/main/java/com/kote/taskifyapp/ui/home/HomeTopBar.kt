@@ -50,14 +50,16 @@ fun HomeTopBar(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
     ) {
-        IconButton(onClick = {onOpenSidePanel()}) {
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "Menu",
-                modifier = Modifier.size(24.dp)
-            )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = {onOpenSidePanel()}) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Menu",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            Text(groupTasksType.name.lowercase().replaceFirstChar { it.uppercase() }, fontWeight = FontWeight.Bold)
         }
-        Text(groupTasksType.name.lowercase().replaceFirstChar { it.uppercase() }, fontWeight = FontWeight.Bold)
         Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
             IconButton(onClick = { expanded = true }) {
                 Icon(
