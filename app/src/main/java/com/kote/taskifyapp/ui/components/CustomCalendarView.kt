@@ -49,7 +49,8 @@ import java.time.ZoneId
 fun CustomCalendarView(
     tasks: List<Task>,
     tasksUiState: TasksUiState,
-    onNavigateToTaskDetails: (String) -> Unit,
+    onSelectedDate: (String) -> Unit,
+    onNavigateToTaskDetails: (String, String?) -> Unit,
     markAsCompleted: (Int) -> Unit,
     paddingValues: PaddingValues,
 ) {
@@ -67,6 +68,7 @@ fun CustomCalendarView(
         val currentMonth = YearMonth.now().plusMonths(page - (Int.MAX_VALUE / 2).toLong())
         CalendarView(
             month = currentMonth,
+            onSelectedDate = onSelectedDate,
             tasks = tasks,
             tasksUiState = tasksUiState,
             onNavigateToTaskDetails = onNavigateToTaskDetails,
@@ -78,9 +80,10 @@ fun CustomCalendarView(
 @Composable
 private fun CalendarView(
     month: YearMonth,
+    onSelectedDate: (String) -> Unit,
     tasks: List<Task>,
     tasksUiState: TasksUiState,
-    onNavigateToTaskDetails: (String) -> Unit,
+    onNavigateToTaskDetails: (String, String?) -> Unit,
     markAsCompleted: (Int) -> Unit,
 ) {
     val daysInMonth = month.lengthOfMonth()
@@ -142,6 +145,7 @@ private fun CalendarView(
                             indication = null,
                             onClick = {
                                 selectedDate = day
+                                onSelectedDate(selectedDate.toString())
                             }
                         )
                 ) {

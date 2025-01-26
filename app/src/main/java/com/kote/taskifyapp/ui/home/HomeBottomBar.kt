@@ -10,44 +10,60 @@ import androidx.compose.material.icons.filled.Task
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun HomeBottomBar(
+    clickableScreen: UserHomeScreens,
     onClick: (UserHomeScreens) -> Unit,
     modifier: Modifier = Modifier
 ) {
+
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
     ) {
         IconButton(
-            onClick = {onClick(UserHomeScreens.TASKS)}
+            onClick = {
+                onClick(UserHomeScreens.TASKS)
+            }
         ) {
             Icon(
                 imageVector = Icons.Default.Task,
                 contentDescription = "Home",
+                tint = if (clickableScreen == UserHomeScreens.TASKS) Color.Blue else Color.Gray,
                 modifier = Modifier.size(26.dp)
             )
         }
         IconButton(
-            onClick = {onClick(UserHomeScreens.CALENDAR)}
+            onClick = {
+                onClick(UserHomeScreens.CALENDAR)
+            }
         ) {
             Icon(
                 imageVector = Icons.Default.CalendarToday,
                 contentDescription = "Calendar",
+                tint = if (clickableScreen == UserHomeScreens.CALENDAR) Color.Blue else Color.Gray,
                 modifier = Modifier.size(26.dp)
             )
         }
         IconButton(
-            onClick = {onClick(UserHomeScreens.SETTINGS)},
+            onClick = {
+                onClick(UserHomeScreens.SETTINGS)
+          }
         ) {
             Icon(
                 imageVector = Icons.Default.Settings,
                 contentDescription = "Settings",
+                tint = if (clickableScreen == UserHomeScreens.SETTINGS) Color.Blue else Color.Gray,
                 modifier = Modifier.size(26.dp)
             )
         }

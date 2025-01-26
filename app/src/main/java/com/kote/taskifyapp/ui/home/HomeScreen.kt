@@ -27,13 +27,15 @@ enum class UserHomeScreens {
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    onNavigateToTaskDetails: (String) -> Unit,
+    userHomeScreens: UserHomeScreens,
+    updateHomeScreens: (UserHomeScreens) -> Unit,
+    onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val tasks by viewModel.tasks.collectAsState()
     val tasksUiState by viewModel.tasksUiState.collectAsState()
-    var userScreens by remember { mutableStateOf(UserHomeScreens.CALENDAR) }
+    var selectedDate: String? = null
 
     Scaffold(
         topBar = {
@@ -49,7 +51,8 @@ fun HomeScreen(
         },
         bottomBar = {
             HomeBottomBar(
-                onClick = {userScreens = it},
+                clickableScreen = userHomeScreens,
+                onClick = {updateHomeScreens(it)},
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp, bottom = 24.dp, start = 32.dp, end = 32.dp)
@@ -57,7 +60,7 @@ fun HomeScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { onNavigateToTaskDetails("") },
+                onClick = { onNavigateToTaskDetails("", selectedDate) },
                 shape = CircleShape,
                 containerColor = Color(0xFF4872FB),
                 contentColor = Color.White,
@@ -72,7 +75,7 @@ fun HomeScreen(
             }
         }
     ) { paddingValues ->
-        when (userScreens) {
+        when (userHomeScreens) {
             UserHomeScreens.TASKS -> {
                 HomeListView(
                     tasks = tasks,
@@ -87,6 +90,7 @@ fun HomeScreen(
                 CustomCalendarView(
                     tasks = tasks,
                     tasksUiState = tasksUiState,
+                    onSelectedDate = {selectedDate = it},
                     onNavigateToTaskDetails = onNavigateToTaskDetails,
                     markAsCompleted = viewModel::markAsCompleted,
                     paddingValues = paddingValues

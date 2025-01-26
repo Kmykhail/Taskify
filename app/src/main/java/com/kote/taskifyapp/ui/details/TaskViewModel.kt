@@ -14,6 +14,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -24,20 +27,24 @@ class TaskViewModel @Inject constructor(
     private val workRepository: WorkManagerRepository
 ) : ViewModel() {
 
-    private val _taskState = MutableStateFlow<Task>(Task())
+    private val _taskState = MutableStateFlow(Task())
     val taskState : StateFlow<Task> = _taskState
 
     init {
         viewModelScope.launch {
             val taskId: String? = savedStateHandle["taskId"]
-//            val date: String? = savedStateHandle["date"]
-//            Log.d("Debug", "TaskViewModel, taskId:${taskId}, date:${date}")
+            val dateString: String? = savedStateHandle["date"]
+
             repository.getAllTasksDesc().collect{ tasks ->
                 if (!taskId.isNullOrEmpty()) {
                     tasks.firstOrNull{ it.id == taskId.toInt() }?.let { _taskState.value = it }
                 } else {
                     val futureTaskId = if (tasks.isNotEmpty()) tasks[0].id + 1 else 1
                     _taskState.update { it.copy(id = futureTaskId) }
+                }
+
+                if (dateString != null) {
+                    updateTaskDate(convertDateToMillis(dateString))
                 }
             }
         }
@@ -107,6 +114,7 @@ class TaskViewModel @Inject constructor(
 
     fun updateTaskDate(date: Long?) {
         date?.let {
+            Log.d("Debug", "new date:$date")
             if (_taskState.value.date != date) {
                 _taskState.update { it.copy(date = date) }
             }
@@ -133,5 +141,9 @@ class TaskViewModel @Inject constructor(
         }
         val timeInMillis = timeInMinutes * 60 * 1000L
         return calendar.timeInMillis + timeInMillis
+    }
+
+    private fun convertDateToMillis(dateString: String): Long {
+        return LocalDate.parse(dateString).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
     }
 }
