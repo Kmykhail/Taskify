@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.logging.Filter
 import javax.inject.Inject
 
 enum class SortType {
@@ -59,6 +58,17 @@ class HomeViewModel @Inject constructor(
 
     fun getNumberActiveTasks(): Int {
         return tasks.value.count { !it.isCompleted }
+    }
+
+    fun deleteAllTasks() {
+        viewModelScope.launch {
+            tasks.value.forEach { task ->
+                workRepository.cancelCompletedTask(task.id)
+                workRepository.cancelNotification(task.id)
+            }
+
+            repository.deleteAllTasks()
+        }
     }
 
     fun markAsCompleted(taskId: Int) {

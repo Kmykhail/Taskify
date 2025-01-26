@@ -9,9 +9,9 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,7 +27,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Start
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,7 +45,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.data.Task
@@ -64,7 +62,6 @@ fun HomeListView(
             .padding(paddingValues)
             .fillMaxSize()
     ) {
-
         ShowTasks(
             tasks = tasks.filter { !it.isCompleted },
             title = "Active",
@@ -137,7 +134,7 @@ private fun ShowTasks(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun TaskItem(
     task: Task,
@@ -155,14 +152,10 @@ private fun TaskItem(
             .padding(vertical = 2.dp)
             .padding(end = 16.dp)
             .fillMaxWidth()
-            .clickable { onNavigateToTaskDetails(task.id.toString()) }
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onLongPress = {
-                        showBottomSheet = true
-                    }
-                )
-            }
+            .combinedClickable(
+                onClick = { onNavigateToTaskDetails(task.id.toString()) },
+                onLongClick = { showBottomSheet = true}
+            )
     ) {
         Checkbox(
             checked = task.isCompleted,
@@ -186,7 +179,11 @@ private fun TaskItem(
             sheetState = sheetState
         ) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                IconButton(
+                    onClick = {}
+                ) {
+                    Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                }
             }
         }
     }

@@ -106,9 +106,7 @@ fun ModalDateTimeSheet(
                         IconButton(onClick = {
                             onTimeChange(null)
                             removeReminder(task.id)
-                        }) {
-                            Icon(imageVector = Icons.Default.Close, contentDescription = "Remove reminder")
-                        }
+                        }) { Icon(imageVector = Icons.Default.Close, contentDescription = "Remove reminder") }
                     }
                 }
             }

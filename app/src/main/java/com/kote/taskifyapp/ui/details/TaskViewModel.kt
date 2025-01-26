@@ -37,6 +37,13 @@ class TaskViewModel @Inject constructor(
         }
     }
 
+    fun restoreTask() {
+        viewModelScope.launch {
+            _taskState.update { it.copy(isCompleted = false) }
+            repository.updateTask(_taskState.value)
+        }
+    }
+
     fun saveTask() {
         viewModelScope.launch {
             _taskState.value.run {
@@ -101,10 +108,8 @@ class TaskViewModel @Inject constructor(
     }
 
     fun updateTaskTime(time: Int?) {
-        time?.let {
-            if (_taskState.value.time != time) {
-                _taskState.update { it.copy(time = time) }
-            }
+        if (_taskState.value.time != time) {
+            _taskState.update { it.copy(time = time) }
         }
     }
 

@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Flag
@@ -75,42 +76,64 @@ fun TaskScreen(
                 .fillMaxWidth()
                 .focusRequester(focusRequester2)
         )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
-            IconButton(onClick = {openDatTimeSheet = !openDatTimeSheet}) {
-                Icon(imageVector = Icons.Outlined.CalendarMonth, contentDescription = "Set day and time", tint = viewModel.getTaskCalendarColor())
-            }
-            Box {
-                IconButton(onClick = {openPrioritySelector = !openPrioritySelector}) {
-                    Icon(imageVector = Icons.Outlined.Flag, contentDescription = "Set priority", tint = viewModel.getTaskPriorityColor())
-                }
-                if (openPrioritySelector) {
-                    PriorityMenu(onDismissRequest = {openPrioritySelector = it}, onPriorityChange = viewModel::updateTaskPriority)
-                }
-            }
-            IconButton(
-                onClick = {
-                    viewModel.deleteTask()
-                    navigateBack()
-                },
-                enabled = task.isCreated
+        if (task.isCompleted) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
-                Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete task")
+                IconButton(
+                    onClick = {
+                        viewModel.restoreTask()
+                        navigateBack()
+                    },
+                    enabled = !task.title.isNullOrEmpty() || !task.description.isNullOrEmpty()
+                ) { Icon(imageVector = Icons.Default.Restore, contentDescription = "Restore task") }
+                IconButton(
+                    onClick = {
+                        viewModel.deleteTask()
+                        navigateBack()
+                    },
+                    enabled = task.isCreated
+                ) { Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete task") }
             }
-            Spacer(modifier = Modifier.weight(1f))
-            IconButton(
-                onClick = {
-                    viewModel.saveTask()
-                    navigateBack()
-                },
-                enabled = !task.title.isNullOrEmpty() || !task.description.isNullOrEmpty()
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
             ) {
-                Icon(
-                    imageVector = Icons.Default.Done,
-                    contentDescription = "Create/update task"
-                )
+                IconButton(onClick = {openDatTimeSheet = !openDatTimeSheet}) {
+                    Icon(imageVector = Icons.Outlined.CalendarMonth, contentDescription = "Set day and time", tint = viewModel.getTaskCalendarColor())
+                }
+                Box {
+                    IconButton(onClick = {openPrioritySelector = !openPrioritySelector}) {
+                        Icon(imageVector = Icons.Outlined.Flag, contentDescription = "Set priority", tint = viewModel.getTaskPriorityColor())
+                    }
+                    if (openPrioritySelector) {
+                        PriorityMenu(onDismissRequest = {openPrioritySelector = it}, onPriorityChange = viewModel::updateTaskPriority)
+                    }
+                }
+                IconButton(
+                    onClick = {
+                        viewModel.deleteTask()
+                        navigateBack()
+                    },
+                    enabled = task.isCreated
+                ) {
+                    Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete task")
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(
+                    onClick = {
+                        viewModel.saveTask()
+                        navigateBack()
+                    },
+                    enabled = !task.title.isNullOrEmpty() || !task.description.isNullOrEmpty()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Done,
+                        contentDescription = "Create/update task"
+                    )
+                }
             }
         }
     }
