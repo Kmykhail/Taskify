@@ -166,7 +166,7 @@ private fun CalendarView(
                         .size(42.dp)
                 ) {
                     Text(
-                        text = Instant.ofEpochMilli(dayMillis).atZone(ZoneId.systemDefault()).toLocalDate().dayOfMonth.toString(),//day.dayOfMonth.toString(),
+                        text = Instant.ofEpochMilli(dayMillis).atZone(ZoneId.systemDefault()).toLocalDate().dayOfMonth.toString(),
                         textAlign = TextAlign.Center,
                         color = when (dayMillis) {
                             selectedDate -> MaterialTheme.colorScheme.surfaceContainerLowest

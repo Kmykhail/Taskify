@@ -13,30 +13,24 @@ import com.kote.taskifyapp.R
 
 @Composable
 fun ShowPermissionDialog(
-    ctx: Context,
-    onDismissDialog: (Boolean) -> Unit
+    context: Context,
+    onDismissRequest: () -> Unit
 ) {
     AlertDialog(
-        onDismissRequest = { onDismissDialog(false) },
-        title = { Text("Notification permission required") },
-        text = {
-            Text(text = "This app requires notification permission to function properly. Please enable it in settings)")
-        },
-        dismissButton = {
-            Button(onClick = {
-                onDismissDialog(false)
-            }) { Text("Skip") }
-        },
+        onDismissRequest = onDismissRequest,
+        title = { Text(stringResource(R.string.alert_permission_title)) },
+        text = { Text(stringResource(R.string.alert_permission_text)) },
+        dismissButton = { Button(onClick = { onDismissRequest() }) { Text(stringResource(R.string.alert_permission_dismiss)) } },
         confirmButton = {
             Button(onClick = {
-                    onDismissDialog(false)
+                    onDismissRequest()
                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        data = Uri.fromParts("package", ctx.packageName, null)
+                        data = Uri.fromParts("package", context.packageName, null)
                     }
-                    ctx.startActivity(intent)
+                    context.startActivity(intent)
                 }
-            ) { Text(stringResource(R.string.notification_pop_button_text)) }
+            ) { Text(stringResource(R.string.alert_permission_confirm)) }
         }
     )
 }

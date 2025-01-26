@@ -28,7 +28,7 @@ data class Task (
     val description: String? = null,
     val date: Long? = null,
     val time: Int? = null,
-    val reminderType: ReminderType = ReminderType.OnTime,
+    val reminderType: ReminderType = ReminderType.None,
     val deletionTime: Long? = null,
     val priority: Priority = Priority.NoPriority,
     val tag: List<String> = emptyList(),

@@ -195,8 +195,8 @@ class HomeViewModel @Inject constructor(
                 repository.updateTask(updated)
                 delay(400)
 
-                workRepository.scheduleCompletedTask(taskId)
-                workRepository.cancelAlarmNotification(taskId)
+                workRepository.scheduleCompletedTask(it.id)
+                workRepository.cancelAlarmNotification(it.id, it.title)
             }
         }
     }

@@ -1,15 +1,21 @@
 <resources>
     <string name="app_name">Taskify</string>
 
-    <string name="notification_pop_button_text">Settings</string>
 
     <string name="side_panel_all">All</string>
     <string name="side_panel_today">Today</string>
     <string name="side_panel_planned">Planned</string>
     <string name="side_panel_completed">Completed</string>
 
-    <string name="alert_dismiss">Dismiss</string>
+    <string name="alert_time_picker_dismiss">Dismiss</string>
     <string name="alert_ok">Ok</string>
+    <string name="alert_permission_title">Notification permission required</string>
+    <string name="alert_permission_text">This app requires notification permission to function properly. Please enable it in settings</string>
+    <string name="alert_permission_dismiss">Skip</string>
+    <string name="alert_permission_confirm">Settings</string>
+    <string name="alert_reminder_title">Reminder</string>
+    <string name="alert_reminder_confirm">Settings</string>
+    <string name="alert_reminder_dismiss">Cancel</string>
 
     <string name="high_priority">High priority</string>
     <string name="medium_priority">Medium priority</string>
@@ -29,4 +35,9 @@
     <string name="title_sort">Sort by title</string>
     <string name="date_sort">Sort by date</string>
     <string name="priority_sort">Sort by priority</string>
+
+    <string name="time">Time</string>
+    <string name="reminder">Reminder</string>
+    <string name="none">None</string>
+    <string name="on_time">On time</string>
 </resources>

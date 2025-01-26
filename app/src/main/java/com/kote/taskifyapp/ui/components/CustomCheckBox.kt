@@ -1,9 +1,5 @@
 package com.kote.taskifyapp.ui.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -38,7 +33,7 @@ fun CustomCheckBox(
     Column(
         verticalArrangement = Arrangement.Center,
         modifier = Modifier
-            .padding(horizontal = 14.dp)
+            .padding(horizontal = 14.dp, vertical = 8.dp)
     ) {
         Box(modifier = Modifier
             .size(size)
