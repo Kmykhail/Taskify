@@ -63,6 +63,7 @@ fun HomeListView(
     tasks: List<Task>,
     tasksUiState: TasksUiState,
     onNavigateToTaskDetails: (String) -> Unit,
+    onNavigateToSelectionScreen: () -> Unit,
     markAsCompleted: (Int) -> Unit,
     paddingValues: PaddingValues,
 ) {
@@ -75,6 +76,7 @@ fun HomeListView(
             tasks = tasks.filter { !it.isCompleted },
             title = "Active",
             onNavigateToTaskDetails = onNavigateToTaskDetails,
+            onNavigateToSelectionScreen = onNavigateToSelectionScreen,
             markAsCompleted = markAsCompleted
         )
 
@@ -83,6 +85,7 @@ fun HomeListView(
                 tasks = tasks.filter { it.isCompleted },
                 title = "Completed",
                 onNavigateToTaskDetails = onNavigateToTaskDetails,
+                onNavigateToSelectionScreen = onNavigateToSelectionScreen
             )
         }
     }
@@ -94,21 +97,13 @@ private fun ShowTasks(
     tasks: List<Task>,
     title: String,
     onNavigateToTaskDetails: (String) -> Unit,
+    onNavigateToSelectionScreen: () -> Unit,
     markAsCompleted: (Int) -> Unit = {},
 ) {
     if (tasks.isEmpty()) return
 
     var isExpanded by remember { mutableStateOf(true) }
     val listState = rememberLazyListState()
-    val scrollPosition by derivedStateOf {
-        if (listState.layoutInfo.totalItemsCount > 0) {
-            val maxScroll = listState.layoutInfo.totalItemsCount - listState.layoutInfo.visibleItemsInfo.size
-            if (maxScroll > 0) {
-                listState.firstVisibleItemIndex.toFloat() / maxScroll
-            } else {0f}
-        } else {0f}
-    }
-
 
     val transition = updateTransition(targetState = isExpanded, label = "expandTransition")
     val iconRotation by transition.animateFloat(
@@ -139,13 +134,6 @@ private fun ShowTasks(
                 )
             }
         }
-//        LinearProgressIndicator(
-//            progress = { scrollPosition },
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(4.dp)
-//                .rotate(90f)
-//        )
         AnimatedVisibility(
             visible = isExpanded,
             enter = fadeIn() + expandVertically(),
@@ -153,7 +141,7 @@ private fun ShowTasks(
         ) {
             LazyColumn {
                 items(tasks) { task ->
-                    TaskItem(task, onNavigateToTaskDetails, markAsCompleted, title == "Active")
+                    TaskItem(task, onNavigateToTaskDetails, onNavigateToSelectionScreen, markAsCompleted, title == "Active")
                 }
             }
         }
@@ -165,11 +153,10 @@ private fun ShowTasks(
 private fun TaskItem(
     task: Task,
     onNavigateToTaskDetails: (String) -> Unit,
+    onNavigateToSelectionScreen: () -> Unit,
     markAsCompleted: (Int) -> Unit,
     enabled: Boolean,
 ) {
-    var showBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val context = LocalContext.current
 
     fun vibration() {
@@ -194,8 +181,8 @@ private fun TaskItem(
             .combinedClickable(
                 onClick = { onNavigateToTaskDetails(task.id.toString()) },
                 onLongClick = {
-                    showBottomSheet = true
                     vibration()
+                    onNavigateToSelectionScreen()
                 }
             )
     ) {
@@ -212,21 +199,6 @@ private fun TaskItem(
                 contentDescription = "Clock",
                 modifier = Modifier.size(24.dp)
             )
-        }
-    }
-
-    if (showBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = {showBottomSheet = false},
-            sheetState = sheetState
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                IconButton(
-                    onClick = {}
-                ) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = null)
-                }
-            }
         }
     }
 }

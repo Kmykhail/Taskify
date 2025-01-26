@@ -118,9 +118,7 @@ fun TaskScreen(
                         navigateBack()
                     },
                     enabled = task.isCreated
-                ) {
-                    Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete task")
-                }
+                ) { Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete task") }
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = {
