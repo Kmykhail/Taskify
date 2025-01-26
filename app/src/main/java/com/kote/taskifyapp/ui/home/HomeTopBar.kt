@@ -1,9 +1,13 @@
 package com.kote.taskifyapp.ui.home
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreHoriz
@@ -15,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,16 +27,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeTopBar(
+    filterType: FilterType,
     onSortChange: (SortType) -> Unit,
     onFiltrationChange: (FilterType) -> Unit,
     onSwitchView: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var filterSwitcher by remember { mutableStateOf(FilterType.INCOMPLETED) }
-    var expanded by remember { mutableStateOf(false) } // State to manage dropdown visibility
+    var expanded by remember { mutableStateOf(false) }
+    var pendingFilterUpdate by remember { mutableStateOf<FilterType?>(null) }
+
+    LaunchedEffect(expanded) {
+        if (!expanded && pendingFilterUpdate != null) {
+            delay(50)
+            onFiltrationChange(pendingFilterUpdate!!)
+            pendingFilterUpdate = null
+        }
+    }
 
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -46,7 +61,7 @@ fun HomeTopBar(
             )
         }
         Text(text = "Today") // TODO
-        Box {
+        Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
             IconButton(onClick = { expanded = true }) {
                 Icon(
                     imageVector = Icons.Default.MoreHoriz,
@@ -58,28 +73,22 @@ fun HomeTopBar(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
-                if (filterSwitcher == FilterType.INCOMPLETED) {
+                if (filterType == FilterType.SHOW_ACTIVE) {
                     DropdownMenuItem(
                         text = { Text("Show completed") },
-                        leadingIcon = {
-                            Icon(imageVector = Icons.Filled.Task, contentDescription = "Show ALL tasks")
-                        },
+                        leadingIcon = { Icon(imageVector = Icons.Filled.Task, contentDescription = null) },
                         onClick = {
-                            filterSwitcher = FilterType.ALL
-                            onFiltrationChange(filterSwitcher)
                             expanded = false
+                            pendingFilterUpdate = FilterType.SHOW_COMPLETED
                         }
                     )
                 } else {
                     DropdownMenuItem(
                         text = { Text("Hide completed") },
-                        leadingIcon = {
-                            Icon(imageVector = Icons.Outlined.Task, contentDescription = "Show COMPLETED tasks")
-                        },
+                        leadingIcon = { Icon(imageVector = Icons.Outlined.Task, contentDescription = null) },
                         onClick = {
-                            filterSwitcher = FilterType.INCOMPLETED
-                            onFiltrationChange(filterSwitcher)
                             expanded = false
+                            pendingFilterUpdate = FilterType.SHOW_ACTIVE
                         }
                     )
                 }

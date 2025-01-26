@@ -72,7 +72,7 @@ class WorkManagerRepository @Inject constructor(
         }
     }
 
-    fun removeNotification(id: Int) {
+    fun cancelNotification(id: Int) {
         workManager.cancelUniqueWork(id.toString() + NOTIFICATION)
     }
 
@@ -113,8 +113,8 @@ class WorkManagerRepository @Inject constructor(
         }
     }
 
-    fun cancelCompletedTask(id: String) {
-        workManager.cancelUniqueWork(id + CLEANUP)
+    fun cancelCompletedTask(id: Int) {
+        workManager.cancelUniqueWork(id.toString() + CLEANUP)
     }
     // Cleanup end
 }
