@@ -54,6 +54,9 @@ import androidx.compose.ui.text.style.TextAlign
 import com.kote.taskifyapp.R
 import com.kote.taskifyapp.data.Priority
 import com.kote.taskifyapp.data.Task
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,10 +84,15 @@ fun TaskScreen(
 
     LaunchedEffect(task.isCreated) {
         if (!task.isCreated) {
-            focusRequester1.requestFocus()
-            keyboardController?.show()
+            delay(100)
+            withContext(Dispatchers.Main) {
+                focusRequester1.requestFocus()
+                keyboardController?.show()
+            }
         } else {
-            keyboardController?.hide()
+            withContext(Dispatchers.Main) {
+                keyboardController?.hide()
+            }
         }
     }
 
