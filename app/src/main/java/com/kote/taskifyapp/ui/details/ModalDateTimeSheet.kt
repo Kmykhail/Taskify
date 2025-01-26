@@ -21,12 +21,15 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerColors
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
@@ -48,6 +51,8 @@ import androidx.core.content.ContextCompat
 import com.kote.taskifyapp.data.Task
 import com.kote.taskifyapp.ui.components.OpenTimerPicker
 import com.kote.taskifyapp.ui.components.ShowPermissionDialog
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,10 +63,12 @@ fun ModalDateTimeSheet(
     removeReminder: (id: Int) -> Unit,
     onDismissRequest: (Boolean) -> Unit,
 ) {
+    val currentDateInMillis: Long = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+
     // datePicker
     val datePickerState = rememberDatePickerState(
         initialDisplayMode = DisplayMode.Picker,
-        initialSelectedDateMillis = task.date ?: System.currentTimeMillis()
+        initialSelectedDateMillis = task.date ?: currentDateInMillis
     )
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -88,10 +95,10 @@ fun ModalDateTimeSheet(
             showPermissionDialog = true
         }
     }
-
     ModalBottomSheet(
         onDismissRequest = { onDismissRequest(false) },
         sheetState = bottomSheetState,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
         Row(
             verticalAlignment = Alignment.Top,
@@ -112,18 +119,22 @@ fun ModalDateTimeSheet(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            DatePicker(state = datePickerState)
+            DatePicker(state = datePickerState, colors = DatePickerDefaults.colors(
+                selectedDayContainerColor = if (datePickerState.selectedDateMillis != null && datePickerState.selectedDateMillis!! >=  currentDateInMillis) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                todayDateBorderColor = MaterialTheme.colorScheme.primary,
+            ))
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 10.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(color = Color.White)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(color = MaterialTheme.colorScheme.surfaceContainerHigh)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(horizontal = 2.dp, vertical = 2.dp)
                         .clickable {
                             when {
                                 ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED -> {

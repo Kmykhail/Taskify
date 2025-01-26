@@ -93,19 +93,6 @@ class TaskViewModel @Inject constructor(
         workRepository.cancelCompletedTask(id)
     }
 
-    fun getTaskPriorityColor(): Color {
-        return when(_taskState.value.priority) {
-            Priority.High -> Color.Red
-            Priority.Medium -> Color.Yellow
-            Priority.Low -> Color.Green
-            Priority.NoPriority -> Color.Gray
-        }
-    }
-
-    fun getTaskCalendarColor() : Color {
-        return if (_taskState.value.date != null) Color(0xFF4872FB) else Color.Gray
-    }
-
     fun updateTaskTitle(title: String) {
         _taskState.update { it.copy(title = title) }
     }

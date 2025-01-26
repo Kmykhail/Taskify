@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
@@ -78,7 +79,7 @@ fun HomeScreen(
                         FloatingActionButton(
                             onClick = { onNavigateToTaskDetails("", selectedDate) },
                             shape = CircleShape,
-                            containerColor = Color(0xFF4872FB),
+                            containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = Color.White,
                             modifier = Modifier
                                 .size(52.dp)

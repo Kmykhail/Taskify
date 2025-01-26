@@ -25,7 +25,7 @@ fun TaskifyNavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    var userScreens = remember { mutableStateOf(UserHomeScreens.TASKS) }
+    val userScreens = remember { mutableStateOf(UserHomeScreens.TASKS) }
 
     NavHost(
         navController = navController,
