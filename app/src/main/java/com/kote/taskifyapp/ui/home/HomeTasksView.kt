@@ -27,12 +27,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
@@ -54,15 +52,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kote.taskifyapp.R
 import com.kote.taskifyapp.data.Priority
 import com.kote.taskifyapp.data.Task
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import com.kote.taskifyapp.ui.components.TaskSummary
+import com.kote.taskifyapp.ui.theme.TaskifyTheme
 
 @Composable
 fun HomeListView(
@@ -190,8 +186,7 @@ private fun TaskItem(
     task: Task,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
-    markAsCompleted: () -> Unit,
-    modifier: Modifier = Modifier
+    markAsCompleted: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -205,56 +200,53 @@ private fun TaskItem(
         }
         vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK))
     }
+    TaskSummary(
+        task = task,
+        checkBox = {
+            Checkbox(
+                checked = task.isCompleted,
+                onCheckedChange = { if (!task.isCompleted) markAsCompleted() },
+                enabled = !task.isCompleted,
+                colors = CheckboxDefaults.colors(
+                    uncheckedColor = when (task.priority) {
+                        Priority.High -> Color(0xFFAF2A2A)
+                        Priority.Medium -> Color(0xFFE0B83D)
+                        Priority.Low -> Color(0xFF93C47D)
+                        else -> MaterialTheme.colorScheme.outline
+                    }
+                )
+            )
+       },
+        textStyleEffect = TextStyle(textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None),
+        modifier = Modifier
+           .padding(vertical = 2.dp)
+           .padding(end = 16.dp)
+           .fillMaxWidth()
+           .combinedClickable(
+               onClick = { onNavigateToTaskDetails(task.id.toString(), null) },
+               onLongClick = {
+                   vibration()
+                   onNavigateToSelectionScreen()
+               }
+           )
+    )
+}
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start,
-        modifier = modifier
-            .padding(vertical = 2.dp)
-            .padding(end = 16.dp)
-            .fillMaxWidth()
-            .combinedClickable(
-                onClick = { onNavigateToTaskDetails(task.id.toString(), null) },
-                onLongClick = {
-                    vibration()
-                    onNavigateToSelectionScreen()
-                }
-            )
-    ) {
-        Checkbox(
-            checked = task.isCompleted,
-            onCheckedChange = { if (!task.isCompleted) markAsCompleted() },
-            enabled = !task.isCompleted,
-            colors = CheckboxDefaults.colors(
-                uncheckedColor = when (task.priority) {
-                    Priority.High -> Color(0xFFAF2A2A)
-                    Priority.Medium -> Color(0xFFE0B83D)
-                    Priority.Low -> Color(0xFF93C47D)
-                    else -> MaterialTheme.colorScheme.outline
-                }
-            )
+@Preview
+@Composable
+fun TaskItemPreview() {
+    TaskifyTheme {
+        TaskItem(
+            task = Task(
+                id = 2,
+                title = "Test2",
+                description = "Description for Test2 task",
+                date = 456L,
+                priority = Priority.Low,
+            ),
+            onNavigateToTaskDetails = { _, _: String? -> },
+            onNavigateToSelectionScreen = { },
+            markAsCompleted = {}
         )
-        Text(
-            text = task.title ?: "Untitled",
-            style = TextStyle(textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f)
-        )
-        task.date?.let {
-            val taskLocalDate = Instant.ofEpochMilli(task.date).atZone(ZoneId.systemDefault()).toLocalDate()
-            Text(
-                text = "${taskLocalDate.format(DateTimeFormatter.ofPattern("MMM"))} ${taskLocalDate.dayOfMonth}",
-                fontSize = 12.sp,
-                modifier = Modifier.padding(start = 8.dp)
-            )
-        }
-        task.time?.let {
-            Icon(
-                imageVector = Icons.Outlined.AccessTime,
-                contentDescription = "Clock",
-                modifier = Modifier.size(16.dp)
-            )
-        }
     }
 }

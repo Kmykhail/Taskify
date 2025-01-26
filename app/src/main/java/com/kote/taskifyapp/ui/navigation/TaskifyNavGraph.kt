@@ -38,7 +38,6 @@ fun TaskifyNavGraph(
                 viewModel = hiltViewModel<HomeViewModel>(),
                 navigationBack = {navController.popBackStack()},
                 modifier = modifier
-
             )
         }
         composable(
