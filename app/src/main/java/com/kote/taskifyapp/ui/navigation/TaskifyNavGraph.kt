@@ -17,7 +17,10 @@ import com.kote.taskifyapp.ui.details.TaskViewModel
 import com.kote.taskifyapp.ui.home.HomeViewModel
 import com.kote.taskifyapp.ui.home.HomeScreen
 import com.kote.taskifyapp.ui.home.HomeTasksSelectionScreen
-import com.kote.taskifyapp.ui.home.UserHomeScreens
+
+enum class UserHomeScreens {
+    TASKS, CALENDAR, SETTINGS
+}
 
 @Composable
 fun TaskifyNavGraph(

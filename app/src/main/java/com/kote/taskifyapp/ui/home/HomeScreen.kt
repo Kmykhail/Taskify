@@ -12,17 +12,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.ui.components.CustomCalendarView
-
-enum class UserHomeScreens {
-    TASKS, CALENDAR, SETTINGS
-}
+import com.kote.taskifyapp.ui.navigation.UserHomeScreens
 
 @Composable
 fun HomeScreen(
