@@ -64,6 +64,7 @@ fun TaskScreen(
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             keyboardActions = KeyboardActions(onNext = { focusRequester2.requestFocus() }),
             isSingleLine = true,
+            readOnly = task.isCompleted,
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester1)
@@ -72,6 +73,7 @@ fun TaskScreen(
             value = task.description ?: "",
             placeholder = "Description",
             onValueChange = viewModel::updateTaskDescription,
+            readOnly = task.isCompleted,
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester2)

@@ -18,6 +18,7 @@ fun CustomTextField(
     keyboardOptions: KeyboardOptions? = null,
     keyboardActions: KeyboardActions? = null,
     isSingleLine: Boolean = false,
+    readOnly: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     TextField(
@@ -34,6 +35,7 @@ fun CustomTextField(
         keyboardOptions = keyboardOptions ?: KeyboardOptions(),
         keyboardActions = keyboardActions ?: KeyboardActions(),
         singleLine = isSingleLine,
+        readOnly = readOnly,
         modifier = modifier
     )
 }

@@ -1,6 +1,5 @@
 package com.kote.taskifyapp.ui.home
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import android.os.VibrationEffect
@@ -17,19 +16,21 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -41,9 +42,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,8 +53,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kote.taskifyapp.data.Task
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun HomeListView(
@@ -65,99 +70,130 @@ fun HomeListView(
     markAsCompleted: (Int) -> Unit,
     paddingValues: PaddingValues = PaddingValues(0.dp),
 ) {
-    Column(
-        modifier = Modifier
-            .padding(paddingValues)
-            .fillMaxSize()
-    ) {
+    val expandedStates = remember { mutableStateMapOf<String, Boolean>() }
+    when (tasksUiState.taskFilterType) {
+        TaskFilterType.ALL -> {
+            val sortedTasks = tasks.sortedBy { it.isCompleted }
+            val groupedTasks = sortedTasks.groupBy { if (it.isCompleted) "Completed" else "Active" }
 
-        when (tasksUiState.taskFilterType) {
-            TaskFilterType.ALL -> {
-                ShowTasks(
-                    tasks = tasks.filter { !it.isCompleted },
-                    title = "Active",
-                    onNavigateToTaskDetails = onNavigateToTaskDetails,
-                    onNavigateToSelectionScreen = onNavigateToSelectionScreen,
-                    markAsCompleted = markAsCompleted
-                )
-                ShowTasks(
-                    tasks = tasks.filter { it.isCompleted },
-                    title = "Completed",
-                    onNavigateToTaskDetails = onNavigateToTaskDetails,
-                    onNavigateToSelectionScreen = onNavigateToSelectionScreen
-                )
+            LazyColumn(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .padding(horizontal = 10.dp)
+                    .fillMaxSize()
+            ) {
+                groupedTasks.forEach { (title, taskList) ->
+                    if (taskList.isNotEmpty()) {
+                        item {
+                            if (title == "Completed") Spacer(modifier = Modifier.height(20.dp))
+                            TaskSection(
+                                title = title,
+                                tasks = taskList,
+                                isExpanded = expandedStates.getOrPut(title) { true },
+                                onToggleExpand = { expandedStates[title] = !expandedStates[title]!! },
+                                onNavigateToTaskDetails = onNavigateToTaskDetails,
+                                onNavigateToSelectionScreen = onNavigateToSelectionScreen,
+                                markAsCompleted = markAsCompleted
+                            )
+                        }
+                    }
+                }
             }
-            else -> {
-                ShowTasks(
-                    tasks = tasks,
-                    title = tasksUiState.taskFilterType.name.lowercase().replaceFirstChar { it.uppercase() },
-                    onNavigateToTaskDetails = onNavigateToTaskDetails,
-                    onNavigateToSelectionScreen = onNavigateToSelectionScreen,
-                    markAsCompleted = markAsCompleted
-                )
+        }
+        else -> {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .padding(horizontal = 10.dp)
+                    .fillMaxSize()
+            ) {
+                val title = tasksUiState.taskFilterType.name.lowercase().replaceFirstChar { it.uppercase() }
+                item {
+                    TaskSection(
+                        title = title,
+                        tasks = tasks,
+                        isExpanded = expandedStates.getOrPut(title) { true },
+                        onToggleExpand = { expandedStates[title] = !expandedStates[title]!! },
+                        onNavigateToTaskDetails = onNavigateToTaskDetails,
+                        onNavigateToSelectionScreen = onNavigateToSelectionScreen,
+                        markAsCompleted = markAsCompleted
+                    )
+                }
             }
         }
     }
 }
 
-@SuppressLint("UnrememberedMutableState")
 @Composable
-private fun ShowTasks(
-    tasks: List<Task>,
+fun TaskSection(
     title: String,
+    tasks: List<Task>,
+    isExpanded: Boolean,
+    onToggleExpand: () -> Unit,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
-    markAsCompleted: (Int) -> Unit = {},
+    markAsCompleted: (Int) -> Unit
 ) {
-    if (tasks.isEmpty()) return
-
-    var isExpanded by remember { mutableStateOf(true) }
-
-    val transition = updateTransition(targetState = isExpanded, label = "expandTransition")
-    val iconRotation by transition.animateFloat(
-            transitionSpec = { tween(durationMillis = 500, easing = LinearOutSlowInEasing) },
-            label = "iconRotation"
-    ) { if (it) 180f else 0f }
-
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 10.dp)
-            .clip(RoundedCornerShape(4.dp))
-            .background(color = Color.White)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+    if (tasks.isNotEmpty()) {
+        Column(
             modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 2.dp)
-                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color.White)
         ) {
-            Text(text = title, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.weight(1f))
-            Text(text = tasks.size.toString())
-            IconButton(onClick = {isExpanded = !isExpanded} ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = "Chevron down",
-                    modifier = Modifier.rotate(iconRotation)
-                )
-            }
-        }
-
-        AnimatedVisibility(
-            visible = isExpanded,
-            enter = fadeIn() + expandVertically(),
-            exit = fadeOut() + shrinkVertically()
-        ) {
-            LazyColumn {
-                items(tasks) { task ->
-                    TaskItem(
-                        task = task,
-                        onNavigateToTaskDetails = onNavigateToTaskDetails,
-                        onNavigateToSelectionScreen = onNavigateToSelectionScreen,
-                        markAsCompleted = markAsCompleted,
-                    )
+            SectionHeader(title, tasks.size, isExpanded, onToggleExpand)
+            AnimatedVisibility(
+                visible = isExpanded,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                Column {
+                    tasks.forEach { task ->
+                        TaskItem(
+                            task = task,
+                            onNavigateToTaskDetails = onNavigateToTaskDetails,
+                            onNavigateToSelectionScreen = onNavigateToSelectionScreen,
+                            markAsCompleted = markAsCompleted
+                        )
+                    }
                 }
             }
+        }
+    } else {
+        Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
+            Text(text = "No reminders", fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+private fun SectionHeader(
+    title: String,
+    taskCount: Int,
+    isExpanded: Boolean,
+    onToggleExpand: () -> Unit
+) {
+    val transition = updateTransition(targetState = isExpanded, label = "expandTransition")
+    val iconRotation by transition.animateFloat(
+        transitionSpec = { tween(durationMillis = 350, easing = LinearOutSlowInEasing) },
+        label = "iconRotation"
+    ) { if (it) 0f else 270f }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onToggleExpand)
+            .padding(horizontal = 12.dp)
+    ) {
+        Text(text = title, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.weight(1f))
+        Text("$taskCount")
+        IconButton(onClick = onToggleExpand) {
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = "Expand/Collapse",
+                modifier = Modifier.rotate(iconRotation)
+            )
         }
     }
 }
@@ -169,6 +205,7 @@ private fun TaskItem(
     onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
     markAsCompleted: (Int) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
 
@@ -187,7 +224,7 @@ private fun TaskItem(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
-        modifier = Modifier
+        modifier = modifier
             .padding(vertical = 2.dp)
             .padding(end = 16.dp)
             .fillMaxWidth()
@@ -206,14 +243,24 @@ private fun TaskItem(
         )
         Text(
             text = task.title ?: "Untitled",
-            style = TextStyle(textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None)
+            style = TextStyle(textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
         )
-        Spacer(modifier = Modifier.weight(1f))
-        if (task.time != null) {
+        task.date?.let {
+            val taskLocalDate = Instant.ofEpochMilli(task.date).atZone(ZoneId.systemDefault()).toLocalDate()
+            Text(
+                text = "${taskLocalDate.format(DateTimeFormatter.ofPattern("MMM"))} ${taskLocalDate.dayOfMonth}",
+                fontSize = 12.sp,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+        task.time?.let {
             Icon(
                 imageVector = Icons.Outlined.AccessTime,
                 contentDescription = "Clock",
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(16.dp)
             )
         }
     }

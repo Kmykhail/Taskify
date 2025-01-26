@@ -56,7 +56,6 @@ fun HomeTopBar(
                 modifier = Modifier.size(24.dp)
             )
         }
-        Text(text = "Today") // TODO
         Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
             IconButton(onClick = { expanded = true }) {
                 Icon(

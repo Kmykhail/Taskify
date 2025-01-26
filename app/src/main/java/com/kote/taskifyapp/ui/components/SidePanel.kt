@@ -47,7 +47,7 @@ fun SidePanel(
         SidePanelItem("Today", Icons.Outlined.Today, TaskFilterType.TODAY),
         SidePanelItem("Planned", Icons.Outlined.AccessTime, TaskFilterType.PLANNED),
         SidePanelItem("Completed", Icons.Default.DoneAll, TaskFilterType.COMPLETED),
-        SidePanelItem("Important", Icons.Outlined.StarOutline, TaskFilterType.IMPORTANT),
+//        SidePanelItem("Important", Icons.Outlined.StarOutline, TaskFilterType.IMPORTANT),
     )
 
     ModalNavigationDrawer(
