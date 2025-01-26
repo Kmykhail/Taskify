@@ -48,6 +48,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.ui.components.CustomTextField
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.kote.taskifyapp.R
@@ -69,14 +70,22 @@ fun TaskScreen(
 
     val openDatTimeSheet = remember { mutableStateOf(false) }
     val openPrioritySelector = remember { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     DisposableEffect(Unit) {
         Log.d("Debug", "TaskScreen Entered")
-        onDispose { Log.d("Debug", "TaskScreen Exited") }
+        onDispose {
+            Log.d("Debug", "TaskScreen Exited")
+        }
     }
 
-    LaunchedEffect(Unit) {
-        focusRequester1.requestFocus()
+    LaunchedEffect(task.isCreated) {
+        if (!task.isCreated) {
+            focusRequester1.requestFocus()
+            keyboardController?.show()
+        } else {
+            keyboardController?.hide()
+        }
     }
 
     Scaffold(
