@@ -158,7 +158,7 @@ private fun SectionHeader(
     val iconRotation by transition.animateFloat(
         transitionSpec = { tween(durationMillis = 350, easing = LinearOutSlowInEasing) },
         label = "iconRotation"
-    ) { if (it) 0f else 270f }
+    ) { if (it) 0f else -90f }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

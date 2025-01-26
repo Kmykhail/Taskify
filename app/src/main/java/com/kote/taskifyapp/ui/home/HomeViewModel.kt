@@ -9,11 +9,8 @@ import com.kote.taskifyapp.data.repository.WorkManagerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -46,6 +43,7 @@ class HomeViewModel @Inject constructor(
     val groupedTask = _groupedTasks.asStateFlow()
 
     init {
+        workRepository.scheduleDailyCheck()
         viewModelScope.launch {
             repository.allTask
                 .combine(_tasksUiState) { tasks, uiState ->

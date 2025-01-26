@@ -7,6 +7,10 @@ enum class Priority {
     High, Medium, Low, NoPriority
 }
 
+enum class ReminderType(val value: Int) {
+    None(0),
+    OnTime(1)
+}
 @Entity(tableName = "tasks")
 data class Task (
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
@@ -14,6 +18,7 @@ data class Task (
     val description: String? = null,
     val date: Long? = null,
     val time: Int? = null,
+    val reminderType: ReminderType = ReminderType.OnTime,
     val deletionTime: Long? = null,
     val priority: Priority = Priority.NoPriority,
     val tag: List<String> = emptyList(),

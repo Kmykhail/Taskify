@@ -9,9 +9,11 @@ import android.provider.Settings
 import android.util.Log
 import androidx.work.Constraints
 import androidx.work.Data
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.kote.taskifyapp.CLEANUP
 import com.kote.taskifyapp.DELAY_FOR_DELETE
@@ -20,6 +22,7 @@ import com.kote.taskifyapp.KEY_TITLE
 import com.kote.taskifyapp.TASK_ID
 import com.kote.taskifyapp.ReminderReceiver
 import com.kote.taskifyapp.data.worker.CompletedTaskWorker
+import com.kote.taskifyapp.data.worker.TaskCheckWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -32,7 +35,7 @@ class WorkManagerRepository @Inject constructor(
     private val workManager = WorkManager.getInstance(context)
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-    // Notification start
+    // Alarm notification start
     fun scheduleAlarmNotification(
         id: Int,
         title: String?,
@@ -66,7 +69,32 @@ class WorkManagerRepository @Inject constructor(
         alarmManager.cancel(pendingIntent)
         Log.d("Debug", "Cancel alarm notification for task id: $id")
     }
-    // Notification end
+    // Alarm notification end
+
+    // Daily check outdated tasks start
+    fun scheduleDailyCheck() {
+        val constraints = Constraints.Builder()
+//            .setRequiresBatteryNotLow(false)
+//            .setRequiresCharging(false)
+            .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+            .build()
+
+        val dailyCheckRequest = PeriodicWorkRequestBuilder<TaskCheckWorker>(1, TimeUnit.DAYS)
+            .setConstraints(constraints)
+            .build()
+
+        workManager.enqueueUniquePeriodicWork(
+            "DailyTaskCheck",
+            ExistingPeriodicWorkPolicy.KEEP,
+            dailyCheckRequest
+        )
+        Log.d("Debug", "Daily check outdated tasks")
+        val workInfos = workManager.getWorkInfosForUniqueWork("DailyTaskCheck").get()
+        workInfos.forEach {
+            Log.d("Debug", "DailyTaskCheck state: ${it.state}")
+        }
+    }
+    // Daily check outdated tasks end
 
     // Cleanup start
     fun scheduleCompletedTask(id: Int) {
