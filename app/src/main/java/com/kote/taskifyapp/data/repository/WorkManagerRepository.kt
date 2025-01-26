@@ -90,10 +90,10 @@ class WorkManagerRepository @Inject constructor(
             }
 
             val constraints = Constraints.Builder()
-                .setRequiresBatteryNotLow(false)
-                .setRequiresCharging(false)
-                .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
-                .setRequiresDeviceIdle(false)
+//                .setRequiresBatteryNotLow(false)
+//                .setRequiresCharging(false)
+//                .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+//                .setRequiresDeviceIdle(false)
                 .build()
 
             val dailyCheckRequest = PeriodicWorkRequestBuilder<TaskCheckWorker>(1, TimeUnit.DAYS)
@@ -110,6 +110,11 @@ class WorkManagerRepository @Inject constructor(
         } else {
             Log.d("Debug", "Daily checking for outdated tasks is in progress")
         }
+    }
+
+    fun cancelDailyCheck() {
+        workManager.cancelUniqueWork(DAILY_TASK_CHECK)
+        Log.d("Debug", "Cancel daily check")
     }
     // Daily check outdated tasks end
 

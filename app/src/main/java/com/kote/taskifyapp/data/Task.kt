@@ -11,6 +11,13 @@ enum class ReminderType(val value: Int) {
     None(0),
     OnTime(1)
 }
+
+enum class SortType(val value: Int) {
+    Title(0),
+    Date(1),
+    Priority(2)
+}
+
 @Entity(tableName = "tasks")
 data class Task (
     @PrimaryKey(autoGenerate = true) val id: Int = 0,

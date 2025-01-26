@@ -1,5 +1,6 @@
 package com.kote.taskifyapp.ui.components
 
+import android.gesture.Gesture
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -9,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.outlined.AccessTime
-import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material.icons.outlined.Today
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
@@ -39,6 +39,7 @@ fun SidePanel(
     scope: CoroutineScope,
     selectedFilterType: GroupTasksType,
     onSelectedFilterType: (GroupTasksType) -> Unit,
+    gestureEnabled: Boolean = true,
     modifier: Modifier,
     content: @Composable () -> Unit
 ) {
@@ -46,8 +47,7 @@ fun SidePanel(
         SidePanelItem("All", Icons.Default.ContentCopy, GroupTasksType.ALL),
         SidePanelItem("Today", Icons.Outlined.Today, GroupTasksType.TODAY),
         SidePanelItem("Planned", Icons.Outlined.AccessTime, GroupTasksType.PLANNED),
-        SidePanelItem("Completed", Icons.Default.DoneAll, GroupTasksType.COMPLETED),
-        SidePanelItem("Important", Icons.Outlined.StarOutline, GroupTasksType.IMPORTANT),
+        SidePanelItem("Completed", Icons.Default.DoneAll, GroupTasksType.COMPLETED)
     )
 
     ModalNavigationDrawer(
@@ -75,5 +75,6 @@ fun SidePanel(
             }
         },
         content = content,
+        gesturesEnabled = gestureEnabled
     )
 }

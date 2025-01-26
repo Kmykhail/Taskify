@@ -33,6 +33,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -43,7 +44,7 @@ import java.time.YearMonth
 import java.time.ZoneId
 
 @Composable
-fun CustomCalendarView(
+fun HomeCalendarView(
     groupedTasks: Map<String, List<Task>>,
     onSelectedDate: (String) -> Unit,
     onNavigateToTaskDetails: (String, String?) -> Unit,
@@ -70,7 +71,8 @@ fun CustomCalendarView(
     ) {
         Text(
             text = dateString,
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.padding(bottom = 10.dp)
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -134,6 +136,7 @@ private fun CalendarView(
     ) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(daysList, key = {it}) { day ->
                 Column (
