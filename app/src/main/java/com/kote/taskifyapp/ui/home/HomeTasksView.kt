@@ -119,7 +119,7 @@ fun TaskSection(
     if (tasks.isNotEmpty()) {
         Column(
             modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(10.dp))
                 .background(color = MaterialTheme.colorScheme.surfaceContainer)
         ) {
             SectionHeader(title, tasks.size, isExpanded, onToggleExpand)

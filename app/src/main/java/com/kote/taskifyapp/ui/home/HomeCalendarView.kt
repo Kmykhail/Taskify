@@ -1,5 +1,6 @@
 package com.kote.taskifyapp.ui.home
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -33,11 +33,12 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.data.Task
+import com.kote.taskifyapp.ui.theme.TaskifyTheme
 import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
@@ -49,7 +50,7 @@ fun HomeCalendarView(
     onSelectedDate: (String) -> Unit,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     markAsCompleted: (String, Int) -> Unit,
-    paddingValues: PaddingValues,
+    paddingValues: PaddingValues = PaddingValues(0.dp),
 ) {
     val pagerState = rememberPagerState(initialPage = Int.MAX_VALUE / 2, pageCount = { Int.MAX_VALUE })
     var dateString by remember { mutableStateOf("") }
@@ -91,6 +92,7 @@ fun HomeCalendarView(
             state = pagerState,
             modifier = Modifier
                 .fillMaxSize()
+                .padding(vertical = 10.dp)
         ) { page ->
             CalendarView(
                 month = YearMonth.now().plusMonths(page - (Int.MAX_VALUE / 2).toLong()),
@@ -111,9 +113,10 @@ private fun CalendarView(
     onNavigateToTaskDetails: (String, String?) -> Unit,
     markAsCompleted: (String, Int) -> Unit,
 ) {
+    val now = LocalDate.now()
     val daysInMonth = month.lengthOfMonth()
     val daysList = remember(month){ (1 .. daysInMonth).map { month.atDay(it) } }
-    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+    var selectedDate by remember { mutableStateOf(now) }
     val groupedTasksByDate = remember(groupedTasks, daysList) {
         val map = mutableStateMapOf<LocalDate, MutableMap<String, MutableList<Task>>>()
         groupedTasks.forEach { (group, tasks) ->
@@ -132,11 +135,16 @@ private fun CalendarView(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
     ) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier
+                .padding(horizontal = 6.dp)
+                .padding(bottom = 6.dp)
         ) {
             items(daysList, key = {it}) { day ->
                 Column (
@@ -145,10 +153,11 @@ private fun CalendarView(
                     modifier = Modifier
                         .clip(CircleShape)
                         .background(color = when (day) {
-                            LocalDate.now() -> Color.White
-                            selectedDate -> Color.LightGray
-                            else -> Color.Transparent })
-                        .wrapContentSize()
+                                selectedDate -> if (selectedDate >= now) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                                now -> MaterialTheme.colorScheme.surfaceContainerLowest
+                                else -> Color.Transparent
+                            }
+                        )
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
@@ -157,24 +166,30 @@ private fun CalendarView(
                                 onSelectedDate(selectedDate.toString())
                             }
                         )
+                        .size(42.dp)
                 ) {
                     Text(
                         text = day.dayOfMonth.toString(),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        color = when (day) {
+                            selectedDate -> MaterialTheme.colorScheme.surfaceContainerLowest
+                            LocalDate.now() -> MaterialTheme.colorScheme.primary
+                            else -> MaterialTheme.colorScheme.onSurface
+                        }
                     )
-                    if (groupedTasksByDate.contains(day)) {
-                        Icon(
-                            imageVector = Icons.Default.Circle,
-                            tint = Color.Blue,
-                            contentDescription = null,
-                            modifier = Modifier.size(4.dp)
-                        )
-                    }
+                    Icon(
+                        imageVector = Icons.Default.Circle,
+                        tint = if (groupedTasksByDate.contains(day) && selectedDate != day) MaterialTheme.colorScheme.primary else Color.Transparent,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(4.dp)
+                    )
                 }
             }
         }
 
         groupedTasksByDate[selectedDate]?.toMap()?.let {
+//            Log.d("Debug", "groupedTasksByDate, selectedDate: $selectedDate, map: $it")
             HomeListView(
                 groupedTasks = it,
                 onNavigateToTaskDetails = onNavigateToTaskDetails,
@@ -182,5 +197,25 @@ private fun CalendarView(
                 markAsCompleted = markAsCompleted,
             )
         }
+    }
+}
+
+@Preview
+@Composable
+fun HomeCalendarPreview() {
+    TaskifyTheme {
+        HomeCalendarView(
+            groupedTasks = mapOf<String, List<Task>>(
+                "Activity" to listOf(
+                        Task(date = 1740009600000),
+                        Task(date = 1740009600000),
+                        Task(date = 1738540800000),
+                        Task(date = 1739836800000)
+                    )
+            ),
+            onSelectedDate = { _ -> Unit },
+            onNavigateToTaskDetails = { _, _ -> Unit },
+            markAsCompleted = { _, _ -> Unit }
+        )
     }
 }

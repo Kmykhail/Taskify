@@ -21,7 +21,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerColors
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.DropdownMenu
@@ -43,7 +42,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
@@ -119,10 +117,13 @@ fun ModalDateTimeSheet(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            DatePicker(state = datePickerState, colors = DatePickerDefaults.colors(
-                selectedDayContainerColor = if (datePickerState.selectedDateMillis != null && datePickerState.selectedDateMillis!! >=  currentDateInMillis) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                todayDateBorderColor = MaterialTheme.colorScheme.primary,
-            ))
+            DatePicker(
+                state = datePickerState,
+                colors = DatePickerDefaults.colors(
+                    selectedDayContainerColor = if (datePickerState.selectedDateMillis != null && datePickerState.selectedDateMillis!! >=  currentDateInMillis) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                    todayDateBorderColor = MaterialTheme.colorScheme.primary,
+                )
+            )
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 10.dp)

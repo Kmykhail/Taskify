@@ -2,7 +2,7 @@ package com.kote.taskifyapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val primaryLight = Color(0xFF415F91)
+val primaryLight = Color(0xFF7aa4f6)
 val onPrimaryLight = Color(0xFFFFFFFF)
 val primaryContainerLight = Color(0xFFD6E3FF)
 val onPrimaryContainerLight = Color(0xFF284777)
@@ -38,7 +38,7 @@ val surfaceContainerLight = Color(0xFFEDEDF4)
 val surfaceContainerHighLight = Color(0xFFE7E8EE)
 val surfaceContainerHighestLight = Color(0xFFE2E2E9)
 
-val primaryLightMediumContrast = Color(0xFF133665)
+val primaryLightMediumContrast = Color(0xFF2a5897)
 val onPrimaryLightMediumContrast = Color(0xFFFFFFFF)
 val primaryContainerLightMediumContrast = Color(0xFF506DA0)
 val onPrimaryContainerLightMediumContrast = Color(0xFFFFFFFF)
