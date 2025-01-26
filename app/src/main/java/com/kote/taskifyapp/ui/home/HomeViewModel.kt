@@ -61,6 +61,7 @@ class HomeViewModel @Inject constructor(
                 TaskFilterType.ALL -> tasks.filter { true }
                 TaskFilterType.IMPORTANT -> tasks
             }
+
             when (uiState.sortType) {
                 SortType.TITLE -> filteredTasks.sortedBy { it.title }
                 SortType.DATE -> filteredTasks.sortedBy { it.date }
@@ -75,7 +76,6 @@ class HomeViewModel @Inject constructor(
 
     fun setSortType(sortType: SortType) { _tasksUiState.update { it.copy(sortType = sortType) }}
     fun setFilterType(taskFilterType: TaskFilterType) { _tasksUiState.update { it.copy(taskFilterType = taskFilterType) } }
-
 
     fun deleteSelectedTasks(selectedTaskIds: Set<Int>) {
         viewModelScope.launch {
