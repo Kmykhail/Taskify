@@ -67,7 +67,9 @@ fun CustomCalendarView(
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(paddingValues)
+        modifier = Modifier
+            .padding(paddingValues)
+            .padding(vertical = 10.dp)
     ) {
         Text(
             text = dateString,
