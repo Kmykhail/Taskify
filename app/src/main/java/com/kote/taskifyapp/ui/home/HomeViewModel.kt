@@ -1,5 +1,6 @@
 package com.kote.taskifyapp.ui.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kote.taskifyapp.DELAY_FOR_DELETE
@@ -15,12 +16,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZoneOffset
 import javax.inject.Inject
+
+enum class UserHomeScreens {
+    TASKS,
+    CALENDAR,
+    SETTINGS
+}
 
 enum class GroupTasksType {
     ALL,
@@ -34,8 +43,10 @@ enum class GroupTasksType {
 }
 
 data class TasksUiState(
-    val groupTasksType: GroupTasksType = GroupTasksType.ALL,
+    val groupTasksType: GroupTasksType,
     val sortType: SortType = SortType.Date,
+    val userHomeScreens: UserHomeScreens = UserHomeScreens.TASKS,
+    val selectedDate: Long? = null
 )
 
 @HiltViewModel
@@ -48,9 +59,13 @@ class HomeViewModel @Inject constructor(
     val tasksUiState = _tasksUiState.asStateFlow()
 
     private val _groupedTasks = MutableStateFlow(emptyMap<String, List<Task>>())
-    val groupedTask = _groupedTasks.asStateFlow()
+    val groupedTasks = _groupedTasks.asStateFlow()
+
+    private val _allCalendarTasks = MutableStateFlow(emptyMap<String, List<Task>>())
+    val allCalendarTasks = _allCalendarTasks.asStateFlow()
 
     private val groupOrder = listOf("Completed", "Overdue", "Not planned", "Active", "Today", "Planned")
+    private val today = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
 
     init {
         workRepository.scheduleDailyCheckAlarm()
@@ -58,16 +73,33 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val initialType = userPreferencesRepository.groupTaskTypeFlow.first()
             _tasksUiState.value = TasksUiState(groupTasksType = initialType)
-
-            userPreferencesRepository.groupTaskTypeFlow.collect { savedGroupType ->
-                _tasksUiState.update { it?.copy(groupTasksType = savedGroupType) }
+            if (initialType == GroupTasksType.TODAY) {
+                setSelectedDay(today)
             }
+        }
+
+        viewModelScope.launch {
+            val currentDate = LocalDate.now()
+            repository.getAllCalendarTasks()
+                .map { tasks ->
+                    tasks.groupBy {
+                        when {
+                            it.isCompleted -> "Completed"
+                            convertMillisToDate(it.date!!) < currentDate -> "Overdue"
+                            convertMillisToDate(it.date!!) == currentDate -> "Today"
+                            else -> "Planned"
+                        }
+                    }
+                }
+                .collect { grouped ->
+                    _allCalendarTasks.value = grouped
+                }
         }
 
         viewModelScope.launch {
             repository.allTask.combine(_tasksUiState.filterNotNull()) { tasks, uiState ->
                 val currentDate = LocalDate.now()
-                val groupedTasks = when (uiState.groupTasksType) {
+                val grouped = when (uiState.groupTasksType) {
                     GroupTasksType.ALL -> {
                         tasks.groupBy {
                             when {
@@ -99,7 +131,7 @@ class HomeViewModel @Inject constructor(
                 }
                 val sortedGroupedTasks = LinkedHashMap<String, List<Task>>()
                 for (group in groupOrder) {
-                    groupedTasks[group]?.let { taskList ->
+                    grouped[group]?.let { taskList ->
                         sortedGroupedTasks[group] = when(uiState.sortType) {
                             SortType.Title -> taskList.sortedBy { it.title?.lowercase() }
                             SortType.Date -> taskList.sortedBy { it.date }
@@ -119,11 +151,32 @@ class HomeViewModel @Inject constructor(
         workRepository.cancelDailyCheckAlarm()
     }
 
+    fun getDate() : String? {
+        return if (_tasksUiState.value!!.userHomeScreens == UserHomeScreens.CALENDAR) {
+            return _tasksUiState.value!!.selectedDate?.toString()
+        } else if (_tasksUiState.value!!.userHomeScreens == UserHomeScreens.TASKS && _tasksUiState.value!!.groupTasksType == GroupTasksType.TODAY) {
+            return today.toString()
+        } else {
+            null
+        }
+    }
+
     fun setSortType(sortType: SortType) { _tasksUiState.update { it?.copy(sortType = sortType) }}
 
     fun setGroupTasksType(newType: GroupTasksType) {
         _tasksUiState.update { it?.copy(groupTasksType = newType) }
         viewModelScope.launch { userPreferencesRepository.saveGroupTaskType(newType) }
+    }
+
+    fun setUserHomeScreens(homeScreen: UserHomeScreens) {
+        if (homeScreen == UserHomeScreens.CALENDAR && _tasksUiState.value?.selectedDate == null) {
+            setSelectedDay(today)
+        }
+        _tasksUiState.update { it?.copy(userHomeScreens = homeScreen) }
+    }
+
+    fun setSelectedDay(selectedDate: Long) {
+        _tasksUiState.update { it?.copy(selectedDate = selectedDate) }
     }
 
     fun deleteSelectedTasks(selectedTaskIds: Set<Int>) {
@@ -146,6 +199,10 @@ class HomeViewModel @Inject constructor(
                 workRepository.cancelAlarmNotification(taskId)
             }
         }
+    }
+
+    fun allowTaskCreation() : Boolean {
+        return !(_tasksUiState.value?.userHomeScreens == UserHomeScreens.TASKS && _tasksUiState.value?.groupTasksType == GroupTasksType.COMPLETED)
     }
 
     private fun convertMillisToDate(date: Long): LocalDate {

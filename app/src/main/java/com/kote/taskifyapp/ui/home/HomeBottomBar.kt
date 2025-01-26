@@ -11,17 +11,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.kote.taskifyapp.ui.navigation.UserHomeScreens
 
 @Composable
 fun HomeBottomBar(
-    clickableScreen: MutableState<UserHomeScreens>,
-    onCalendarGroupChange: () -> Unit,
+    userHomeScreen: UserHomeScreens,
+    onHomeScreenClick: (UserHomeScreens) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -31,35 +28,32 @@ fun HomeBottomBar(
         modifier = modifier
     ) {
         IconButton(
-            onClick = { clickableScreen.value = UserHomeScreens.TASKS }
+            onClick = { onHomeScreenClick(UserHomeScreens.TASKS) }
         ) {
             Icon(
                 imageVector = Icons.Filled.DashboardCustomize,
                 contentDescription = "Home",
-                tint = if (clickableScreen.value == UserHomeScreens.TASKS) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                tint = if (userHomeScreen == UserHomeScreens.TASKS) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                 modifier = Modifier.size(26.dp)
             )
         }
         IconButton(
-            onClick = {
-                onCalendarGroupChange()
-                clickableScreen.value = UserHomeScreens.CALENDAR
-            }
+            onClick = { onHomeScreenClick(UserHomeScreens.CALENDAR) }
         ) {
             Icon(
                 imageVector = Icons.Default.Today,
                 contentDescription = "Calendar",
-                tint = if (clickableScreen.value == UserHomeScreens.CALENDAR) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                tint = if (userHomeScreen == UserHomeScreens.CALENDAR) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                 modifier = Modifier.size(26.dp)
             )
         }
         IconButton(
-            onClick = { clickableScreen.value = UserHomeScreens.SETTINGS }
+            onClick = { onHomeScreenClick(UserHomeScreens.SETTINGS) }
         ) {
             Icon(
                 imageVector = Icons.Default.Settings,
                 contentDescription = "Settings",
-                tint = if (clickableScreen.value == UserHomeScreens.SETTINGS) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                tint = if (userHomeScreen == UserHomeScreens.SETTINGS) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                 modifier = Modifier.size(26.dp)
             )
         }

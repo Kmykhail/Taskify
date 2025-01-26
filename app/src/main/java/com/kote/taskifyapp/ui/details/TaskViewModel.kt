@@ -44,7 +44,7 @@ class TaskViewModel @Inject constructor(
                     _taskState.update { it.copy(id = futureTaskId) }
                 }
 
-                selectedDate?.let { updateTaskDate(selectedDate.toLong()) }
+                if (!selectedDate.isNullOrEmpty()) updateTaskDate(selectedDate.toLong())
             }
         }
     }

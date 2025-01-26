@@ -20,5 +20,6 @@ class TaskRepository @Inject constructor(
     suspend fun getOverdueTasks(currentDate: Long): List<Task> = taskDao.getOverdueTasks(currentDate)
     suspend fun deleteTask(task: Task) = taskDao.deleteTask(task)
     suspend fun deleteAllTasks() = taskDao.deleteAllTasks()
+    fun getAllCalendarTasks() = taskDao.getAllCalendarTasks()
     suspend fun deleteSpecificTasks(taskIds: Set<Int>) = taskDao.deleteSpecificTasks(taskIds)
 }
