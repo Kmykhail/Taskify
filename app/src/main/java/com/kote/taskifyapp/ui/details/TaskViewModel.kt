@@ -72,15 +72,15 @@ class TaskViewModel @Inject constructor(
     fun deleteTask() {
         viewModelScope.launch {
             if (_taskState.value.isCreated) {
-                cancelNotificationWork(_taskState.value.id)
+                cancelNotificationWork(_taskState.value.id, _taskState.value.title)
                 cancelCompletedTask(_taskState.value.id)
                 repository.deleteTask(_taskState.value)
             }
         }
     }
 
-    fun cancelNotificationWork(id: Int) {
-        workRepository.cancelAlarmNotification(id)
+    private fun cancelNotificationWork(id: Int, title: String?) {
+        workRepository.cancelAlarmNotification(id, title)
     }
 
     private fun cancelCompletedTask(id: Int) {
@@ -107,6 +107,18 @@ class TaskViewModel @Inject constructor(
     fun updateTaskTime(time: Int?) {
         if (_taskState.value.time != time) {
             _taskState.update { it.copy(time = time) }
+            if (time == null) {
+                cancelNotificationWork(_taskState.value.id, _taskState.value.title)
+            }
+        }
+    }
+
+    fun updateReminderType(newType: ReminderType) {
+        if (_taskState.value.reminderType != newType) {
+            _taskState.update { it.copy(reminderType = newType) }
+            if (newType == ReminderType.None) {
+                cancelNotificationWork(_taskState.value.id, taskState.value.title)
+            }
         }
     }
 

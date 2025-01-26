@@ -64,15 +64,15 @@ class WorkManagerRepository @Inject constructor(
                 duration,
                 pendingIntent
             )
-            Log.d("Debug", "Alarm set for task $id at $duration")
+            Log.d("Debug", "Alarm set for task:$id, title:$title at $duration")
         }
     }
 
-    fun cancelAlarmNotification(id: Int) {
+    fun cancelAlarmNotification(id: Int, title: String?) {
         val intent = Intent(context, ReminderReceiver::class.java).apply { action = ACTIVE_NOTIFICATION_ALARM }
         val pendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         alarmManager.cancel(pendingIntent)
-        Log.d("Debug", "Cancel alarm notification for task id: $id")
+        Log.d("Debug", "Cancel alarm notification for task id:$id, title:$title")
     }
     // Alarm notification end
 
@@ -84,7 +84,7 @@ class WorkManagerRepository @Inject constructor(
             val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
             val calendar = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, 10)
+                set(Calendar.HOUR_OF_DAY, 10) // 10:00
                 set(Calendar.MINUTE, 0)
                 set(Calendar.SECOND, 0)
                 if (timeInMillis < System.currentTimeMillis()) {
