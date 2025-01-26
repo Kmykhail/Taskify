@@ -25,16 +25,16 @@ class TaskDaoTest {
         id = 1,
         title = "Test1",
         description = "Description for Test1 task",
-        dueDate = 123L,
-        priority = "Low",
+        date = 123L,
+        priority = Priority.Low,
     )
 
     private val task2 = Task(
         id = 2,
         title = "Test2",
         description = "Description for Test2 task",
-        dueDate = 456L,
-        priority = "Medium",
+        date = 456L,
+        priority = Priority.Low,
     )
 
     @Before
@@ -58,7 +58,7 @@ class TaskDaoTest {
     @Throws(IOException::class)
     fun daoInsert_insertTaskIntoDb() = runBlocking {
         addTaskOnce()
-        val allTasks = taskDao.getAllTasks().first()
+        val allTasks = taskDao.getAllTasksAsc().first()
         assertEquals(allTasks[0], task1)
     }
 
@@ -66,7 +66,7 @@ class TaskDaoTest {
     @Throws(IOException::class)
     fun daoGetTask_returnsAllTaskFromDb() = runBlocking {
         addTwoTasks()
-        val allTasks = taskDao.getAllTasks().first()
+        val allTasks = taskDao.getAllTasksAsc().first()
         assertEquals(allTasks[0], task1)
         assertEquals(allTasks[1], task2)
     }
@@ -89,7 +89,7 @@ class TaskDaoTest {
         addTwoTasks()
         taskDao.updateTask(task1.copy(description = task1Descr))
         taskDao.updateTask(task2.copy(description = task2Descr))
-        val allTasks = taskDao.getAllTasks().first()
+        val allTasks = taskDao.getAllTasksAsc().first()
 
         assertEquals(allTasks[0].description, task1Descr)
         assertEquals(allTasks[1].description, task2Descr)
@@ -103,7 +103,7 @@ class TaskDaoTest {
         taskDao.deleteTask(task1)
         taskDao.deleteTask(task2)
 
-        assertTrue(taskDao.getAllTasks().first().isEmpty())
+        assertTrue(taskDao.getAllTasksAsc().first().isEmpty())
     }
 
     private suspend fun addTaskOnce() {

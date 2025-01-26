@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.kote.taskifyapp"
-        minSdk = 28
+        minSdk = 29
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
