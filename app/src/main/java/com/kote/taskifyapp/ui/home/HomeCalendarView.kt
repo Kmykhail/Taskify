@@ -24,7 +24,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,11 +45,12 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
+import java.time.ZoneOffset
 
 @Composable
 fun HomeCalendarView(
     groupedTasks: Map<String, List<Task>>,
-    onSelectedDate: (String) -> Unit,
+    previousSelectedDate: MutableState<Long?>,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     markAsCompleted: (String, Int) -> Unit,
     paddingValues: PaddingValues = PaddingValues(0.dp),
@@ -96,36 +99,39 @@ fun HomeCalendarView(
         ) { page ->
             CalendarView(
                 month = YearMonth.now().plusMonths(page - (Int.MAX_VALUE / 2).toLong()),
-                onSelectedDate = onSelectedDate,
+                previousSelectedDate = previousSelectedDate.value ?: LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli(),
+                onSelectedDate = { previousSelectedDate.value = it },
                 groupedTasks = groupedTasks,
                 onNavigateToTaskDetails = onNavigateToTaskDetails,
                 markAsCompleted = markAsCompleted
             )
         }
+
     }
 }
 
 @Composable
 private fun CalendarView(
     month: YearMonth,
-    onSelectedDate: (String) -> Unit,
+    previousSelectedDate: Long,
+    onSelectedDate: (Long) -> Unit,
     groupedTasks: Map<String, List<Task>>,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     markAsCompleted: (String, Int) -> Unit,
 ) {
-    val now = LocalDate.now()
+    val nowMillis = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+    var selectedDate by remember { mutableLongStateOf(previousSelectedDate) }
+    Log.d("Debug", "Open CalendarView with date: $selectedDate")
+
     val daysInMonth = month.lengthOfMonth()
-    val daysList = remember(month){ (1 .. daysInMonth).map { month.atDay(it) } }
-    var selectedDate by remember { mutableStateOf(now) }
+    val daysList = remember(month){ (1 .. daysInMonth).map { month.atDay(it).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() } }
     val groupedTasksByDate = remember(groupedTasks, daysList) {
-        val map = mutableStateMapOf<LocalDate, MutableMap<String, MutableList<Task>>>()
+        val map = mutableStateMapOf<Long, MutableMap<String, MutableList<Task>>>()
         groupedTasks.forEach { (group, tasks) ->
             tasks.forEach { task ->
                 if (task.date != null) {
-                    val taskLocalDate =
-                        Instant.ofEpochMilli(task.date).atZone(ZoneId.systemDefault()).toLocalDate()
-                    daysList.find { taskLocalDate.isEqual(it) }?.let {
-                        map.getOrPut(taskLocalDate) { mutableMapOf() }.getOrPut(group) { mutableListOf() }.add(task)
+                    daysList.find { task.date == it }?.let {
+                        map.getOrPut(task.date) { mutableMapOf() }.getOrPut(group) { mutableListOf() }.add(task)
                     }
                 }
             }
@@ -146,15 +152,15 @@ private fun CalendarView(
                 .padding(horizontal = 6.dp)
                 .padding(bottom = 6.dp)
         ) {
-            items(daysList, key = {it}) { day ->
+            items(daysList, key = {it}) { dayMillis ->
                 Column (
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .clip(CircleShape)
-                        .background(color = when (day) {
-                                selectedDate -> if (selectedDate >= now) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-                                now -> MaterialTheme.colorScheme.surfaceContainerLowest
+                        .background(color = when (dayMillis) {
+                                selectedDate -> if (selectedDate >= nowMillis) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                                nowMillis -> MaterialTheme.colorScheme.secondaryContainer //MaterialTheme.colorScheme.surfaceContainerLowest
                                 else -> Color.Transparent
                             }
                         )
@@ -162,24 +168,24 @@ private fun CalendarView(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
                             onClick = {
-                                selectedDate = day
-                                onSelectedDate(selectedDate.toString())
+                                selectedDate = dayMillis
+                                onSelectedDate(selectedDate)
                             }
                         )
                         .size(42.dp)
                 ) {
                     Text(
-                        text = day.dayOfMonth.toString(),
+                        text = Instant.ofEpochMilli(dayMillis).atZone(ZoneId.systemDefault()).toLocalDate().dayOfMonth.toString(),//day.dayOfMonth.toString(),
                         textAlign = TextAlign.Center,
-                        color = when (day) {
+                        color = when (dayMillis) {
                             selectedDate -> MaterialTheme.colorScheme.surfaceContainerLowest
-                            LocalDate.now() -> MaterialTheme.colorScheme.primary
+                            nowMillis -> MaterialTheme.colorScheme.primary
                             else -> MaterialTheme.colorScheme.onSurface
                         }
                     )
                     Icon(
                         imageVector = Icons.Default.Circle,
-                        tint = if (groupedTasksByDate.contains(day) && selectedDate != day) MaterialTheme.colorScheme.primary else Color.Transparent,
+                        tint = if (groupedTasksByDate.contains(dayMillis) && selectedDate != dayMillis) MaterialTheme.colorScheme.primary else Color.Transparent,
                         contentDescription = null,
                         modifier = Modifier
                             .size(4.dp)
@@ -189,7 +195,6 @@ private fun CalendarView(
         }
 
         groupedTasksByDate[selectedDate]?.toMap()?.let {
-//            Log.d("Debug", "groupedTasksByDate, selectedDate: $selectedDate, map: $it")
             HomeListView(
                 groupedTasks = it,
                 onNavigateToTaskDetails = onNavigateToTaskDetails,
@@ -204,8 +209,9 @@ private fun CalendarView(
 @Composable
 fun HomeCalendarPreview() {
     TaskifyTheme {
+        val selectedDate = remember { mutableStateOf<Long?>(null) }
         HomeCalendarView(
-            groupedTasks = mapOf<String, List<Task>>(
+            groupedTasks = mapOf(
                 "Activity" to listOf(
                         Task(date = 1740009600000),
                         Task(date = 1740009600000),
@@ -213,9 +219,9 @@ fun HomeCalendarPreview() {
                         Task(date = 1739836800000)
                     )
             ),
-            onSelectedDate = { _ -> Unit },
-            onNavigateToTaskDetails = { _, _ -> Unit },
-            markAsCompleted = { _, _ -> Unit }
+            previousSelectedDate = selectedDate,
+            onNavigateToTaskDetails = { _, _ ->  },
+            markAsCompleted = { _, _ -> }
         )
     }
 }

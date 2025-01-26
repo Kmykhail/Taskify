@@ -1,5 +1,6 @@
 package com.kote.taskifyapp.ui.home
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -14,9 +15,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,6 +33,7 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     viewModel: HomeViewModel,
     userHomeScreens: MutableState<UserHomeScreens>,
+    previousSelectedDate: MutableState<Long?>,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
     modifier: Modifier = Modifier
@@ -37,7 +42,11 @@ fun HomeScreen(
     val tasksUiState by viewModel.tasksUiState.collectAsState()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    var selectedDate: String? = null
+
+    DisposableEffect(Unit) {
+        Log.d("Debug", "HomeScreen Entered")
+        onDispose { Log.d("Debug", "HomeScreen Exited") }
+    }
 
     if (tasksUiState == null) {
         CircularProgressIndicator()
@@ -77,12 +86,12 @@ fun HomeScreen(
                 floatingActionButton = {
                     if (userHomeScreens.value != UserHomeScreens.SETTINGS) {
                         FloatingActionButton(
-                            onClick = { onNavigateToTaskDetails("", selectedDate) },
+                            onClick = { onNavigateToTaskDetails("", previousSelectedDate.value.toString()) },
                             shape = CircleShape,
                             containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = Color.White,
                             modifier = Modifier
-                                .size(52.dp)
+                                .size(52.dp),
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
@@ -107,7 +116,7 @@ fun HomeScreen(
                     UserHomeScreens.CALENDAR -> {
                         HomeCalendarView(
                             groupedTasks = groupedTasks,
-                            onSelectedDate = {selectedDate = it},
+                            previousSelectedDate = previousSelectedDate,
                             onNavigateToTaskDetails = onNavigateToTaskDetails,
                             markAsCompleted = viewModel::markAsCompleted,
                             paddingValues = paddingValues

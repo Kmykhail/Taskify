@@ -34,7 +34,7 @@ class TaskViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val taskId: String? = savedStateHandle["taskId"]
-            val dateString: String? = savedStateHandle["date"]
+            val selectedDate: String? = savedStateHandle["date"]
 
             repository.getAllTasksDesc().collect{ tasks ->
                 if (!taskId.isNullOrEmpty()) {
@@ -44,9 +44,7 @@ class TaskViewModel @Inject constructor(
                     _taskState.update { it.copy(id = futureTaskId) }
                 }
 
-                if (dateString != null) {
-                    updateTaskDate(convertDateToMillis(dateString))
-                }
+                selectedDate?.let { updateTaskDate(selectedDate.toLong()) }
             }
         }
     }
