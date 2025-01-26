@@ -10,6 +10,7 @@ import com.kote.taskifyapp.data.ReminderType
 import com.kote.taskifyapp.data.Task
 import com.kote.taskifyapp.data.repository.WorkManagerRepository
 import com.kote.taskifyapp.data.repository.TaskRepository
+import com.kote.taskifyapp.util.calculateReminderTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -130,18 +131,6 @@ class TaskViewModel @Inject constructor(
 
     fun updateTaskPriority(priority: Priority) {
         _taskState.update { it.copy(priority = priority) }
-    }
-
-    private fun calculateReminderTime(dateInMillis: Long, timeInMinutes: Int): Long {
-        val calendar = Calendar.getInstance().apply {
-            timeInMillis = dateInMillis
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-        val timeInMillis = timeInMinutes * 60 * 1000L
-        return calendar.timeInMillis + timeInMillis
     }
 
     private fun convertDateToMillis(dateString: String): Long {

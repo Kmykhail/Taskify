@@ -17,7 +17,7 @@ class TaskRepository @Inject constructor(
     suspend fun updateTask(task: Task) = taskDao.updateTask(task)
     suspend fun insertTask(task: Task) = taskDao.insertTask(task)
     suspend fun getTaskById(taskId: Int): Task? = taskDao.getTaskById(taskId)
-    suspend fun getOutdatedTasks(currentDate: Long): List<Task> = taskDao.getOutdatedTasks(currentDate)
+    suspend fun getOverdueTasks(currentDate: Long): List<Task> = taskDao.getOverdueTasks(currentDate)
     suspend fun deleteTask(task: Task) = taskDao.deleteTask(task)
     suspend fun deleteAllTasks() = taskDao.deleteAllTasks()
     suspend fun deleteSpecificTasks(taskIds: Set<Int>) = taskDao.deleteSpecificTasks(taskIds)

@@ -69,6 +69,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.material)
 
+    implementation(libs.androidx.datastore.preferences)
+
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)
 
