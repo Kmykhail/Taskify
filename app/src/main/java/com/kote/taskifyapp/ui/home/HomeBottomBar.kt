@@ -5,8 +5,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Task
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -27,7 +27,7 @@ fun HomeBottomBar(
             onClick = {}
         ) {
             Icon(
-                imageVector = Icons.Default.Home,
+                imageVector = Icons.Default.Task,
                 contentDescription = "Home",
                 modifier = Modifier.size(26.dp)
             )

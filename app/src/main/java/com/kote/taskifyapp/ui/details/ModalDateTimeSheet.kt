@@ -1,6 +1,10 @@
 package com.kote.taskifyapp.ui.details
 
-import android.util.Log
+import android.Manifest
+import android.app.Activity
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Timelapse
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,11 +25,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,8 +36,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.kote.taskifyapp.data.Task
+import com.kote.taskifyapp.ui.components.OpenTimerPicker
+import com.kote.taskifyapp.ui.components.ShowNotificationDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,13 +54,30 @@ fun ModalDateTimeSheet(
     onDismissRequest: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // datePicker
     val datePickerState = rememberDatePickerState(
         initialDisplayMode = DisplayMode.Picker,
         initialSelectedDateMillis = task.date ?: System.currentTimeMillis()
     )
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    // timerPicker
     var openTimerPicker by remember { mutableStateOf(false) }
     var selectedTime: Int? = task.time
+
+    // notification permission
+    val context = LocalContext.current
+    val permission = Manifest.permission.POST_NOTIFICATIONS
+    var showPermissionDialog by remember { mutableStateOf(false) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            openTimerPicker = !openTimerPicker
+        } else {
+            showPermissionDialog = true
+        }
+    }
 
     ModalBottomSheet(
         onDismissRequest = { onDismissRequest(false) },
@@ -94,15 +116,25 @@ fun ModalDateTimeSheet(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { openTimerPicker = !openTimerPicker }
+                        .clickable {
+                            when {
+                                ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED -> {
+                                    openTimerPicker = !openTimerPicker
+                                }
+                                ActivityCompat.shouldShowRequestPermissionRationale(context as Activity, permission) -> {
+                                    showPermissionDialog = true
+                                }
+                                else -> {
+                                    permissionLauncher.launch(permission)
+                                }
+                            }
+                        }
                 ) {
                     Icon(imageVector = Icons.Default.Timelapse, contentDescription = "Duration Time")
                     Text("Time")
                     Spacer(modifier = Modifier.weight(1f))
                     if (selectedTime != null) {
-                        Text(
-                            text = String.format("%02d:%02d", selectedTime!! / 60, selectedTime!!  % 60),
-                        )
+                        Text(text = String.format("%02d:%02d", selectedTime!! / 60, selectedTime!!  % 60))
                         IconButton(onClick = {
                             onTimeChange(null)
                             removeReminder(task.id)
@@ -112,33 +144,12 @@ fun ModalDateTimeSheet(
             }
         }
 
-        if (openTimerPicker) {
-            val timePickerState = rememberTimePickerState(
-                is24Hour = true,
-                initialHour = task.time?.div(60) ?: 0,
-                initialMinute = task.time?.rem(60) ?: 0
-            )
+        if (showPermissionDialog) {
+            ShowNotificationDialog(ctx = context, onDismissDialog = {showPermissionDialog = it})
+        }
 
-            AlertDialog(
-                onDismissRequest = {openTimerPicker = false},
-                dismissButton = {
-                    TextButton(onClick = { openTimerPicker = false }) {
-                        Text("Dismiss")
-                    }
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            Log.d("Debug", "current time: ${timePickerState.hour}:${timePickerState.minute}")
-                            selectedTime = timePickerState.hour * 60 + timePickerState.minute
-                            openTimerPicker = false
-                        }
-                    ) {
-                        Text("OK")
-                    }
-                },
-                text = { TimePicker(state = timePickerState) }
-            )
+        if (openTimerPicker) {
+            OpenTimerPicker(task = task, updateTimerPicker = {openTimerPicker = it}, onSelectTime = {selectedTime = it})
         }
     }
 }
