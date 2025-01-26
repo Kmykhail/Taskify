@@ -1,8 +1,5 @@
 package com.kote.taskifyapp.ui.home
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -35,6 +32,7 @@ fun HomeTopBar(
     onSortChange: (SortType) -> Unit,
     onFiltrationChange: (FilterType) -> Unit,
     onSwitchView: () -> Unit,
+    onOpenSidePanel: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -53,7 +51,7 @@ fun HomeTopBar(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
     ) {
-        IconButton(onClick = {}) {
+        IconButton(onClick = {onOpenSidePanel()}) {
             Icon(
                 imageVector = Icons.Default.Menu,
                 contentDescription = "Menu",
