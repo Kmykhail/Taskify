@@ -25,8 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +43,8 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             HomeTopBar(
+                onSortChange = viewModel::setSortType,
+                onSwitchView = {},
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(start = 8.dp, end = 8.dp, top = 8.dp)
@@ -112,31 +112,30 @@ fun HomeScreen(
                         }
                     }
 
-                    val selectedOptions = remember { mutableStateMapOf<Int, Boolean>() }
                     tasks.forEach { task ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Start,
-                            modifier = Modifier
-                                .padding(vertical = 2.dp)
-                                .padding(end = 16.dp)
-                                .fillMaxWidth()
-                                .clickable { onNavigateToTaskDetails(task.id.toString()) }
-                        ) {
-                            Checkbox(
-                                checked = selectedOptions[task.id] ?: false,
-                                onCheckedChange = { isChecked -> selectedOptions[task.id] = isChecked }
-                            )
-                            Text(
-                                text = task.title ?: "Untitled",
-                            )
-                            Spacer(modifier = Modifier.weight(1f))
-                            if (task.time != null) {
-                                Icon(
-                                    imageVector = Icons.Outlined.AccessTime,
-                                    contentDescription = "Clock",
-                                    modifier = Modifier.size(24.dp)
+                        if (!task.isCompleted) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Start,
+                                modifier = Modifier
+                                    .padding(vertical = 2.dp)
+                                    .padding(end = 16.dp)
+                                    .fillMaxWidth()
+                                    .clickable { onNavigateToTaskDetails(task.id.toString()) }
+                            ) {
+                                Checkbox(
+                                    checked = task.isCompleted,
+                                    onCheckedChange = { viewModel.markAsCompleted(task.id) }
                                 )
+                                Text(text = task.title ?: "Untitled",)
+                                Spacer(modifier = Modifier.weight(1f))
+                                if (task.time != null) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.AccessTime,
+                                        contentDescription = "Clock",
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
                             }
                         }
                     }

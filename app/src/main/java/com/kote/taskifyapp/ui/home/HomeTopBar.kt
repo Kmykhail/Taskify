@@ -1,7 +1,5 @@
 package com.kote.taskifyapp.ui.home
 
-import androidx.compose.animation.expandIn
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -11,7 +9,6 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -24,9 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTopBar(
+    onSortChange: (SortType) -> Unit,
+    onSwitchView: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) } // State to manage dropdown visibility
@@ -42,9 +40,7 @@ fun HomeTopBar(
                 modifier = Modifier.size(24.dp)
             )
         }
-        Text(
-            text = "Today", // TODO
-        )
+        Text(text = "Today") // TODO
         Box {
             IconButton(onClick = { expanded = true }) {
                 Icon(
@@ -53,51 +49,39 @@ fun HomeTopBar(
                     modifier = Modifier.size(24.dp)
                 )
             }
-                DropdownMenu(
+            DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
                 DropdownMenuItem(
-                    text = { Text("Sort Tasks") },
+                    text = { Text("Sort by title") },
                     onClick = {
+                        onSortChange(SortType.TITLE)
                         expanded = false
-//                        onSortTasks()
                     }
                 )
                 DropdownMenuItem(
-                    text = { Text("Filter Completed Tasks") },
+                    text = { Text("Sort by date") },
                     onClick = {
+                        onSortChange(SortType.DATE)
                         expanded = false
-//                        onFilterCompletedTasks()
                     }
                 )
                 DropdownMenuItem(
-                    text = { Text("Filter High Priority") },
+                    text = { Text("Sort by priority") },
                     onClick = {
+                        onSortChange(SortType.PRIORITY)
                         expanded = false
-//                        onFilterHighPriority()
                     }
                 )
                 DropdownMenuItem(
-                    text = { Text("Switch View") },
+                    text = { Text("View") },
                     onClick = {
+                        onSwitchView()
                         expanded = false
-//                        onSwitchView()
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text("Settings") },
-                    onClick = {
-                        expanded = false
-//                        onSettingsShortcut()
                     }
                 )
             }
         }
     }
-}
-
-@Composable
-fun Check1() {
-
 }

@@ -103,7 +103,10 @@ fun ModalDateTimeSheet(
                         Text(
                             text = String.format("%02d:%02d", selectedTime!! / 60, selectedTime!!  % 60),
                         )
-                        IconButton(onClick = {removeReminder(task.id)}) {
+                        IconButton(onClick = {
+                            onTimeChange(null)
+                            removeReminder(task.id)
+                        }) {
                             Icon(imageVector = Icons.Default.Close, contentDescription = "Remove reminder")
                         }
                     }

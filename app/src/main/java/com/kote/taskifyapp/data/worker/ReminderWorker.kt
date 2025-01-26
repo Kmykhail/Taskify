@@ -31,7 +31,6 @@ class ReminderWorker(
         val title = inputData.getString(KEY_TITLE) ?: "Reminder"
         val description = inputData.getString(KEY_DESCRIPTION) ?: "Reminder's description"
 
-
         if (ActivityCompat.checkSelfPermission(
                 ctx,
                 Manifest.permission.POST_NOTIFICATIONS)
