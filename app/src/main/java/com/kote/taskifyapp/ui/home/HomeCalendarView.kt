@@ -55,13 +55,13 @@ fun HomeCalendarView(
     markAsCompleted: (String, Int) -> Unit,
     paddingValues: PaddingValues = PaddingValues(0.dp),
 ) {
-    val pagerState = rememberPagerState(initialPage = Int.MAX_VALUE / 2, pageCount = { Int.MAX_VALUE })
+    val pagerState = rememberPagerState(initialPage = Short.MAX_VALUE / 2, pageCount = { Short.MAX_VALUE.toInt() })
     var dateString by remember { mutableStateOf("") }
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }
             .collect {page ->
-                val yearMonth = YearMonth.now().plusMonths(page - (Int.MAX_VALUE / 2).toLong())
+                val yearMonth = YearMonth.now().plusMonths(page - (Short.MAX_VALUE / 2).toLong())
                 dateString = "${yearMonth.month} ${yearMonth.year}"
             }
     }
@@ -98,7 +98,7 @@ fun HomeCalendarView(
                 .padding(vertical = 10.dp)
         ) { page ->
             CalendarView(
-                month = YearMonth.now().plusMonths(page - (Int.MAX_VALUE / 2).toLong()),
+                month = YearMonth.now().plusMonths(page - (Short.MAX_VALUE / 2).toLong()),
                 previousSelectedDate = previousSelectedDate.value ?: LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli(),
                 onSelectedDate = { previousSelectedDate.value = it },
                 groupedTasks = groupedTasks,
@@ -106,7 +106,6 @@ fun HomeCalendarView(
                 markAsCompleted = markAsCompleted
             )
         }
-
     }
 }
 
@@ -121,7 +120,6 @@ private fun CalendarView(
 ) {
     val nowMillis = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
     var selectedDate by remember { mutableLongStateOf(previousSelectedDate) }
-    Log.d("Debug", "Open CalendarView with date: $selectedDate")
 
     val daysInMonth = month.lengthOfMonth()
     val daysList = remember(month){ (1 .. daysInMonth).map { month.atDay(it).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() } }

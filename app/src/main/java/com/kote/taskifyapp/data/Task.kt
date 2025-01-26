@@ -3,8 +3,11 @@ package com.kote.taskifyapp.data
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-enum class Priority {
-    High, Medium, Low, NoPriority
+enum class Priority(val value: Int) {
+    NoPriority(0),
+    Low(1),
+    Medium(2),
+    High(3)
 }
 
 enum class ReminderType(val value: Int) {
