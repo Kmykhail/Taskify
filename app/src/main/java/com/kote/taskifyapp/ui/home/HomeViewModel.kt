@@ -50,8 +50,10 @@ class HomeViewModel @Inject constructor(
     private val _groupedTasks = MutableStateFlow(emptyMap<String, List<Task>>())
     val groupedTask = _groupedTasks.asStateFlow()
 
+    private val groupOrder = listOf("Completed", "Overdue", "Not planned", "Active", "Today", "Planned")
+
     init {
-        workRepository.scheduleDailyCheck()
+        workRepository.scheduleDailyCheckAlarm()
 
         viewModelScope.launch {
             val initialType = userPreferencesRepository.groupTaskTypeFlow.first()
@@ -65,41 +67,47 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             repository.allTask.combine(_tasksUiState.filterNotNull()) { tasks, uiState ->
                 val currentDate = LocalDate.now()
-                val sortedTasks = when (uiState.sortType) {
-                    SortType.Title -> tasks.sortedBy { it.title }
-                    SortType.Date -> tasks.sortedBy { it.date ?: Long.MAX_VALUE }
-                    SortType.Priority -> tasks.sortedBy { it.priority }
-                }
-                when (uiState.groupTasksType) {
+                val groupedTasks = when (uiState.groupTasksType) {
                     GroupTasksType.ALL -> {
-                        sortedTasks.groupBy {
+                        tasks.groupBy {
                             when {
                                 it.isCompleted -> "Completed"
-                                it.date != null && convertMillisToDate(it.date) < currentDate -> "Outdated"
+                                it.date != null && convertMillisToDate(it.date) < currentDate -> "Overdue"
                                 it.date == null -> "Not planned"
                                 else -> "Active"
                             }
                         }
                     }
                     GroupTasksType.TODAY -> {
-                        sortedTasks.filter { it.date != null && convertMillisToDate(it.date) <= currentDate }
+                        tasks.filter { it.date != null && convertMillisToDate(it.date) <= currentDate }
                             .groupBy {
                                 when {
                                     it.isCompleted -> "Completed"
                                     convertMillisToDate(it.date!!) == currentDate -> "Today"
-                                    else -> "Outdated"
+                                    else -> "Overdue"
                                 }
                             }
                     }
                     GroupTasksType.COMPLETED -> {
-                        mapOf("Completed" to sortedTasks.filter { it.isCompleted })
+                        mapOf("Completed" to tasks.filter { it.isCompleted })
                     }
                     GroupTasksType.PLANNED -> {
-                        mapOf("Planned" to sortedTasks.filter {
+                        mapOf("Planned" to tasks.filter {
                             it.date != null && !it.isCompleted && convertMillisToDate(it.date) >= currentDate
                         })
                     }
                 }
+                val sortedGroupedTasks = LinkedHashMap<String, List<Task>>()
+                for (group in groupOrder) {
+                    groupedTasks[group]?.let { taskList ->
+                        sortedGroupedTasks[group] = when(uiState.sortType) {
+                            SortType.Title -> taskList.sortedBy { it.title?.lowercase() }
+                            SortType.Date -> taskList.sortedBy { it.date }
+                            SortType.Priority -> taskList.sortedBy { it.priority }
+                        }
+                    }
+                }
+                sortedGroupedTasks
             }
             .collect { groupedTasks ->
                 _groupedTasks.value = groupedTasks
@@ -108,7 +116,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun cancelDailyCheck() {
-        workRepository.cancelDailyCheck()
+        workRepository.cancelDailyCheckAlarm()
     }
 
     fun setSortType(sortType: SortType) { _tasksUiState.update { it?.copy(sortType = sortType) }}

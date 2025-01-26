@@ -17,7 +17,7 @@ interface TaskDao {
     suspend fun getTaskById(taskId: Int): Task?
 
     @Query("SELECT * FROM tasks WHERE reminderType = 1 and isCompleted = 0 and date IS NOT NULL and date < :currentDate")
-    suspend fun getOutdatedTasks(currentDate: Long) : List<Task>
+    suspend fun getOverdueTasks(currentDate: Long) : List<Task>
 
     @Query("SELECT * FROM tasks ORDER BY id DESC")
     fun getAllTasksDesc() : Flow<List<Task>>
