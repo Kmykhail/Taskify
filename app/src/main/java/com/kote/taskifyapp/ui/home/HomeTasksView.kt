@@ -1,6 +1,11 @@
 package com.kote.taskifyapp.ui.home
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloat
@@ -48,6 +53,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.data.Task
@@ -164,6 +170,19 @@ private fun TaskItem(
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val context = LocalContext.current
+
+    fun vibration() {
+        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val manager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            manager.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        }
+
+        vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK))
+    }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -174,7 +193,10 @@ private fun TaskItem(
             .fillMaxWidth()
             .combinedClickable(
                 onClick = { onNavigateToTaskDetails(task.id.toString()) },
-                onLongClick = { showBottomSheet = true}
+                onLongClick = {
+                    showBottomSheet = true
+                    vibration()
+                }
             )
     ) {
         Checkbox(

@@ -31,16 +31,16 @@ class TaskRepositoryHiltTest {
         id = 1,
         title = "Test1",
         description = "Description for Test1 task",
-        dueDate = 123L,
-        priority = "Low",
+        date = 123L,
+        priority = Priority.Low,
     )
 
     private val task2 = Task(
         id = 2,
         title = "Test2",
         description = "Description for Test2 task",
-        dueDate = 456L,
-        priority = "Medium",
+        date = 456L,
+        priority = Priority.Low,
     )
 
     @Test
@@ -58,7 +58,7 @@ class TaskRepositoryHiltTest {
     fun testGetAllTask() = runBlocking {
         addTwoTasks()
 
-        val fetchedTasks = taskRepository.getAllTasks().first()
+        val fetchedTasks = taskRepository.getAllTasksAsc().first()
         assertEquals(fetchedTasks.size, 2)
         assertEquals(fetchedTasks[0].id, task1.id)
         assertEquals(fetchedTasks[1].id, task2.id)
@@ -73,7 +73,7 @@ class TaskRepositoryHiltTest {
         addTwoTasks()
         taskRepository.updateTask(task1.copy(description = task1Descr))
         taskRepository.updateTask(task2.copy(description = task2Descr))
-        val fetchedTasks = taskRepository.getAllTasks().first()
+        val fetchedTasks = taskRepository.getAllTasksAsc().first()
 
         assertEquals(fetchedTasks[0].description, task1Descr)
         assertEquals(fetchedTasks[1].description, task2Descr)
@@ -87,7 +87,7 @@ class TaskRepositoryHiltTest {
         taskRepository.deleteTask(task1)
         taskRepository.deleteTask(task2)
 
-        assertTrue(taskRepository.getAllTasks().first().isEmpty())
+        assertTrue(taskRepository.getAllTasksAsc().first().isEmpty())
     }
 
     private suspend fun addTwoTasks() {
