@@ -33,15 +33,17 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            HomeTopBar(
-                filterType = tasksUiState.filterType,
-                onSortChange = viewModel::setSortType,
-                onFiltrationChange = viewModel::setFilterType,
-                onSwitchView = {},
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(start = 8.dp, end = 8.dp, top = 8.dp)
-            )
+            if (userHomeScreens == UserHomeScreens.TASKS) {
+                HomeTopBar(
+                    filterType = tasksUiState.filterType,
+                    onSortChange = viewModel::setSortType,
+                    onFiltrationChange = viewModel::setFilterType,
+                    onSwitchView = {},
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp, end = 8.dp, top = 8.dp)
+                )
+            }
         },
         bottomBar = {
             HomeBottomBar(
