@@ -41,7 +41,7 @@ fun HomeTasksSelectionScreen(
     navigationBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val groupedTasks by viewModel.groupedTask.collectAsState()
+    val groupedTasks by viewModel.groupedTasks.collectAsState()
     var isSelectedAll by remember { mutableStateOf(false) }
     var selectedTask by remember { mutableStateOf(setOf<Int>()) }
     val tasks = groupedTasks.values.flatten()

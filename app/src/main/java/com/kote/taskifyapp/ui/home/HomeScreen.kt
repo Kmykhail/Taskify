@@ -16,7 +16,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -24,19 +23,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.ui.components.SidePanel
-import com.kote.taskifyapp.ui.navigation.UserHomeScreens
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    userHomeScreens: MutableState<UserHomeScreens>,
-    previousSelectedDate: MutableState<Long?>,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val groupedTasks by viewModel.groupedTask.collectAsState()
+    val groupedTasks by viewModel.groupedTasks.collectAsState()
+    val allCalendarTasks by viewModel.allCalendarTasks.collectAsState()
     val tasksUiState by viewModel.tasksUiState.collectAsState()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -53,13 +50,13 @@ fun HomeScreen(
             drawerState = drawerState,
             scope = scope,
             selectedFilterType = tasksUiState!!.groupTasksType,
-            onSelectedFilterType = viewModel::setGroupTasksType,
-            gestureEnabled = userHomeScreens.value == UserHomeScreens.TASKS,
+            onSelectedFilterType = { viewModel.setGroupTasksType(it) },
+            gestureEnabled = tasksUiState!!.userHomeScreens == UserHomeScreens.TASKS,//userHomeScreens.value == UserHomeScreens.TASKS,
             modifier = modifier
         ) {
             Scaffold(
                 topBar = {
-                    if (userHomeScreens.value == UserHomeScreens.TASKS) {
+                    if (tasksUiState!!.userHomeScreens == UserHomeScreens.TASKS) {
                         HomeTopBar(
                             groupTasksType = tasksUiState!!.groupTasksType,
                             onSortChange = viewModel::setSortType,
@@ -74,17 +71,17 @@ fun HomeScreen(
                 },
                 bottomBar = {
                     HomeBottomBar(
-                        clickableScreen = userHomeScreens,
-                        onCalendarGroupChange = {viewModel.setGroupTasksType(GroupTasksType.ALL)},
+                        userHomeScreen = tasksUiState!!.userHomeScreens,
+                        onHomeScreenClick = { viewModel.setUserHomeScreens(it) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp, bottom = 24.dp, start = 32.dp, end = 32.dp)
                     )
                 },
                 floatingActionButton = {
-                    if (userHomeScreens.value != UserHomeScreens.SETTINGS) {
+                    if (viewModel.allowTaskCreation()) {
                         FloatingActionButton(
-                            onClick = { onNavigateToTaskDetails("", previousSelectedDate.value.toString()) },
+                            onClick = { onNavigateToTaskDetails("", viewModel.getDate()) },
                             shape = CircleShape,
                             containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = Color.White,
@@ -100,7 +97,7 @@ fun HomeScreen(
                     }
                 }
             ) { paddingValues ->
-                when (userHomeScreens.value) {
+                when (tasksUiState!!.userHomeScreens) {
                     UserHomeScreens.TASKS -> {
                         HomeListView(
                             groupedTasks = groupedTasks,
@@ -113,8 +110,9 @@ fun HomeScreen(
                     }
                     UserHomeScreens.CALENDAR -> {
                         HomeCalendarView(
-                            groupedTasks = groupedTasks,
-                            previousSelectedDate = previousSelectedDate,
+                            groupedTasks = allCalendarTasks,
+                            selectedDate = tasksUiState!!.selectedDate!!,
+                            setSelectedDate = { viewModel.setSelectedDay(it) },
                             onNavigateToTaskDetails = onNavigateToTaskDetails,
                             markAsCompleted = viewModel::markAsCompleted,
                             paddingValues = paddingValues

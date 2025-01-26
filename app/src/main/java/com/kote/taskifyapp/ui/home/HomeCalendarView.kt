@@ -50,7 +50,8 @@ import java.time.ZoneOffset
 @Composable
 fun HomeCalendarView(
     groupedTasks: Map<String, List<Task>>,
-    previousSelectedDate: MutableState<Long?>,
+    selectedDate: Long,
+    setSelectedDate: (Long) -> Unit,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     markAsCompleted: (String, Int) -> Unit,
     paddingValues: PaddingValues = PaddingValues(0.dp),
@@ -99,8 +100,8 @@ fun HomeCalendarView(
         ) { page ->
             CalendarView(
                 month = YearMonth.now().plusMonths(page - (Short.MAX_VALUE / 2).toLong()),
-                previousSelectedDate = previousSelectedDate.value ?: LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli(),
-                onSelectedDate = { previousSelectedDate.value = it },
+                selectedDate = selectedDate,
+                onSelectedDate = setSelectedDate,
                 groupedTasks = groupedTasks,
                 onNavigateToTaskDetails = onNavigateToTaskDetails,
                 markAsCompleted = markAsCompleted
@@ -112,14 +113,13 @@ fun HomeCalendarView(
 @Composable
 private fun CalendarView(
     month: YearMonth,
-    previousSelectedDate: Long,
+    selectedDate: Long,
     onSelectedDate: (Long) -> Unit,
     groupedTasks: Map<String, List<Task>>,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     markAsCompleted: (String, Int) -> Unit,
 ) {
     val nowMillis = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
-    var selectedDate by remember { mutableLongStateOf(previousSelectedDate) }
 
     val daysInMonth = month.lengthOfMonth()
     val daysList = remember(month){ (1 .. daysInMonth).map { month.atDay(it).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() } }
@@ -165,10 +165,7 @@ private fun CalendarView(
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
-                            onClick = {
-                                selectedDate = dayMillis
-                                onSelectedDate(selectedDate)
-                            }
+                            onClick = { onSelectedDate(dayMillis) }
                         )
                         .size(42.dp)
                 ) {
@@ -203,23 +200,23 @@ private fun CalendarView(
     }
 }
 
-@Preview
-@Composable
-fun HomeCalendarPreview() {
-    TaskifyTheme {
-        val selectedDate = remember { mutableStateOf<Long?>(null) }
-        HomeCalendarView(
-            groupedTasks = mapOf(
-                "Activity" to listOf(
-                        Task(date = 1740009600000),
-                        Task(date = 1740009600000),
-                        Task(date = 1738540800000),
-                        Task(date = 1739836800000)
-                    )
-            ),
-            previousSelectedDate = selectedDate,
-            onNavigateToTaskDetails = { _, _ ->  },
-            markAsCompleted = { _, _ -> }
-        )
-    }
-}
+//@Preview
+//@Composable
+//fun HomeCalendarPreview() {
+//    TaskifyTheme {
+//        val selectedDate = remember { mutableStateOf<Long?>(null) }
+//        HomeCalendarView(
+//            groupedTasks = mapOf(
+//                "Activity" to listOf(
+//                        Task(date = 1740009600000),
+//                        Task(date = 1740009600000),
+//                        Task(date = 1738540800000),
+//                        Task(date = 1739836800000)
+//                    )
+//            ),
+//            previousSelectedDate = selectedDate,
+//            onNavigateToTaskDetails = { _, _ ->  },
+//            markAsCompleted = { _, _ -> }
+//        )
+//    }
+//}
