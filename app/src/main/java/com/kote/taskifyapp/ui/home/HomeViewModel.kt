@@ -64,7 +64,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             tasks.value.forEach { task ->
                 workRepository.cancelCompletedTask(task.id)
-                workRepository.cancelNotification(task.id)
+                workRepository.cancelAlarmNotification(task.id)
             }
 
             repository.deleteAllTasks()

@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import javax.inject.Inject
+import kotlin.math.max
 
 @HiltViewModel
 class TaskViewModel @Inject constructor(
@@ -29,9 +30,12 @@ class TaskViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val taskId: String? = savedStateHandle["taskId"]
-            if (!taskId.isNullOrEmpty()) {
-                repository.getAllTasks().collect{ tasks ->
+            repository.getAllTasksDesc().collect{ tasks ->
+                if (!taskId.isNullOrEmpty()) {
                     tasks.firstOrNull{ it.id == taskId.toInt() }?.let { _taskState.value = it }
+                } else {
+                    val futureTaskId = if (tasks.isNotEmpty()) tasks[0].id + 1 else 1
+                    _taskState.update { it.copy(id = futureTaskId) }
                 }
             }
         }
@@ -48,7 +52,7 @@ class TaskViewModel @Inject constructor(
         viewModelScope.launch {
             _taskState.value.run {
                 if (date != null && time != null) {
-                    workRepository.scheduleNotification(id, title, description, calculateReminderTime(date, time))
+                    workRepository.scheduleAlarmNotification(id, title, description, calculateReminderTime(date, time))
                 }
                 if (isCreated) {
                     repository.updateTask(_taskState.value)
@@ -71,7 +75,7 @@ class TaskViewModel @Inject constructor(
     }
 
     fun cancelNotificationWork(id: Int) {
-        workRepository.cancelNotification(id)
+        workRepository.cancelAlarmNotification(id)
     }
 
     private fun cancelCompletedTask(id: Int) {

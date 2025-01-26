@@ -1,7 +1,11 @@
 package com.kote.taskifyapp.data.repository
 
-import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import androidx.work.Constraints
 import androidx.work.Data
@@ -13,12 +17,10 @@ import com.kote.taskifyapp.CLEANUP
 import com.kote.taskifyapp.DELAY_FOR_DELETE
 import com.kote.taskifyapp.KEY_DESCRIPTION
 import com.kote.taskifyapp.KEY_TITLE
-import com.kote.taskifyapp.NOTIFICATION
 import com.kote.taskifyapp.TASK_ID
-import com.kote.taskifyapp.data.workers.CompletedTaskWorker
-import com.kote.taskifyapp.data.workers.NotificationWorker
+import com.kote.taskifyapp.ReminderReceiver
+import com.kote.taskifyapp.data.worker.CompletedTaskWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,59 +30,41 @@ class WorkManagerRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val workManager = WorkManager.getInstance(context)
+    private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     // Notification start
-    @SuppressLint("EnqueueWork")
-    fun scheduleNotification(
+    fun scheduleAlarmNotification(
         id: Int,
         title: String?,
         description: String?,
         duration: Long
     ) {
-        val currentTime = System.currentTimeMillis()
-        val delay = duration - currentTime
-
-        if (delay > 0) {
-            val constraints = Constraints.Builder()
-                .setRequiresBatteryNotLow(false)
-                .setRequiresCharging(false)
-                .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
-                .build()
-
-            val reminderRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
-                .setConstraints(constraints)
-                .setInputData(createNotificationInputData(title, description))
-                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-                .build()
-
-            Log.d("Debug", "Reminder Time (Millis): $duration, long: $duration, current: $currentTime")
-            Log.d("Debug", "Reminder Date-time: ${Date(duration)}")
-            Log.d("Debug", "delay in milliseconds: $delay")
-
-            workManager.enqueueUniqueWork(
-                id.toString() + NOTIFICATION,
-                ExistingWorkPolicy.REPLACE,
-                reminderRequest
-            )
-
-            val workInfos = workManager.getWorkInfosForUniqueWork(id.toString() + NOTIFICATION).get()
-            workInfos.forEach { workInfo ->
-                Log.d("Debug", "WorkManager, notification state: ${workInfo.state}")
+        if (duration - System.currentTimeMillis() > 0) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (!alarmManager.canScheduleExactAlarms()) {
+                    Log.d("Debug", "Manifest.permission.SCHEDULE_EXACT_ALARM is Denied")
+                    val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                    context.startActivity(intent)
+                }
             }
-        } else {
-            Log.w("Warning", "Notification scheduled time is in the past")
+
+            val intent = Intent(context, ReminderReceiver::class.java).apply {
+                putExtra(TASK_ID, id)
+                putExtra(KEY_TITLE, title)
+                putExtra(KEY_DESCRIPTION, description)
+            }
+            val pendingIntent = PendingIntent.getBroadcast(context, id, intent,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, duration, pendingIntent)
+            Log.d("Debug", "Alarm set for task $id at $duration")
         }
     }
 
-    fun cancelNotification(id: Int) {
-        workManager.cancelUniqueWork(id.toString() + NOTIFICATION)
-    }
-
-    private fun createNotificationInputData(title: String?, description: String?): Data {
-        val builder = Data.Builder()
-            .putString(KEY_TITLE, title ?: "")
-            .putString(KEY_DESCRIPTION, description ?: "")
-        return builder.build()
+    fun cancelAlarmNotification(taskId: Int) {
+        val intent = Intent(context, ReminderReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(context, taskId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        alarmManager.cancel(pendingIntent)
+        Log.d("Debug", "Cancel alarm notification for task id: $taskId")
     }
     // Notification end
 
