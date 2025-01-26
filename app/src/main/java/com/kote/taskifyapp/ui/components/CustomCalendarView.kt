@@ -7,14 +7,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
@@ -26,11 +23,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,26 +53,53 @@ fun CustomCalendarView(
     markAsCompleted: (Int) -> Unit,
     paddingValues: PaddingValues,
 ) {
-    val pagerState = rememberPagerState(
-        initialPage = Int.MAX_VALUE / 2,
-        pageCount = { Int.MAX_VALUE }
-    )
+    val pagerState = rememberPagerState(initialPage = Int.MAX_VALUE / 2, pageCount = { Int.MAX_VALUE })
+    var dateString by remember { mutableStateOf("") }
 
-    HorizontalPager(
-        state = pagerState,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
-    ) { page ->
-        val currentMonth = YearMonth.now().plusMonths(page - (Int.MAX_VALUE / 2).toLong())
-        CalendarView(
-            month = currentMonth,
-            onSelectedDate = onSelectedDate,
-            tasks = tasks,
-            tasksUiState = tasksUiState,
-            onNavigateToTaskDetails = onNavigateToTaskDetails,
-            markAsCompleted = markAsCompleted
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }
+            .collect {page ->
+                val yearMonth = YearMonth.now().plusMonths(page - (Int.MAX_VALUE / 2).toLong())
+                dateString = "${yearMonth.month} ${yearMonth.year}"
+            }
+    }
+
+    Column(
+        verticalArrangement = Arrangement.SpaceBetween,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(paddingValues)
+    ) {
+        Text(
+            text = dateString,
+            style = MaterialTheme.typography.headlineSmall
         )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
+        ) {
+            listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun").forEach { day ->
+                Text(
+                    text = day,
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier
+                .fillMaxSize()
+        ) { page ->
+            CalendarView(
+                month = YearMonth.now().plusMonths(page - (Int.MAX_VALUE / 2).toLong()),
+                onSelectedDate = onSelectedDate,
+                tasks = tasks,
+                tasksUiState = tasksUiState,
+                onNavigateToTaskDetails = onNavigateToTaskDetails,
+                markAsCompleted = markAsCompleted
+            )
+        }
     }
 }
 
@@ -106,29 +132,9 @@ private fun CalendarView(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
-        Text(
-            text = "${month.month} ${month.year}",
-            style = MaterialTheme.typography.headlineSmall
-        )
-        Spacer(modifier = Modifier.height(8.dp))
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
         ) {
-            item(span = { GridItemSpan(this.maxLineSpan) }) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start,
-                ) {
-                    listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun").forEach { day ->
-                        Text(
-                            text = day,
-                            modifier = Modifier.weight(1f),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-            }
-
             items(daysList, key = {it}) { day ->
                 Column (
                     verticalArrangement = Arrangement.Center,
