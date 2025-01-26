@@ -1,6 +1,10 @@
 package com.kote.taskifyapp.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -13,13 +17,15 @@ import com.kote.taskifyapp.ui.details.TaskViewModel
 import com.kote.taskifyapp.ui.home.HomeViewModel
 import com.kote.taskifyapp.ui.home.HomeScreen
 import com.kote.taskifyapp.ui.home.HomeTasksSelectionScreen
+import com.kote.taskifyapp.ui.home.UserHomeScreens
 
 @Composable
 fun TaskifyNavGraph(
     navController: NavHostController,
-
     modifier: Modifier = Modifier
 ) {
+    var userScreens by remember { mutableStateOf(UserHomeScreens.TASKS) }
+
     NavHost(
         navController = navController,
         startDestination = "home"
@@ -27,8 +33,10 @@ fun TaskifyNavGraph(
         composable(route = "home") {
             HomeScreen(
                 viewModel = hiltViewModel<HomeViewModel>(),
-                onNavigateToTaskDetails = { taskId ->
-                    navController.navigate("details/$taskId")
+                userHomeScreens = userScreens,
+                updateHomeScreens =  {userScreens = it},
+                onNavigateToTaskDetails = { taskId, date ->
+                    navController.navigate("details/$taskId?date=$date")
                 },
                 onNavigateToSelectionScreen = { navController.navigate("home_tasks_selections") },
                 modifier = modifier
@@ -50,11 +58,11 @@ fun TaskifyNavGraph(
                     defaultValue = null
                     nullable = true
                 },
-//                navArgument("date") {
-//                    type = NavType.StringType
-//                    defaultValue = null
-//                    nullable = true
-//                }
+                navArgument("date") {
+                    type = NavType.StringType
+                    defaultValue = null
+                    nullable = true
+                }
             )
         ) {
             TaskScreen(

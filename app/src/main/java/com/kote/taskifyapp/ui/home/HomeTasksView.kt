@@ -58,7 +58,7 @@ import com.kote.taskifyapp.data.Task
 fun HomeListView(
     tasks: List<Task>,
     tasksUiState: TasksUiState,
-    onNavigateToTaskDetails: (String) -> Unit,
+    onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
     markAsCompleted: (Int) -> Unit,
     paddingValues: PaddingValues = PaddingValues(0.dp),
@@ -92,7 +92,7 @@ fun HomeListView(
 private fun ShowTasks(
     tasks: List<Task>,
     title: String,
-    onNavigateToTaskDetails: (String) -> Unit,
+    onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
     markAsCompleted: (Int) -> Unit = {},
 ) {
@@ -148,7 +148,7 @@ private fun ShowTasks(
 @Composable
 private fun TaskItem(
     task: Task,
-    onNavigateToTaskDetails: (String) -> Unit,
+    onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
     markAsCompleted: (Int) -> Unit,
     enabled: Boolean,
@@ -175,7 +175,7 @@ private fun TaskItem(
             .padding(end = 16.dp)
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { onNavigateToTaskDetails(task.id.toString()) },
+                onClick = { onNavigateToTaskDetails(task.id.toString(), null) },
                 onLongClick = {
                     vibration()
                     onNavigateToSelectionScreen()
