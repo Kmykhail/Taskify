@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.kote.taskifyapp.OVERDUE_NOTIFICATION_ID
-import com.kote.taskifyapp.data.ReminderType
 import com.kote.taskifyapp.data.TaskDatabase
 import com.kote.taskifyapp.data.TaskNotification
 import com.kote.taskifyapp.data.repository.TaskRepository

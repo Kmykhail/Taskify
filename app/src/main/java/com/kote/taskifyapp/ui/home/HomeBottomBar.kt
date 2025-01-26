@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.DashboardCustomize
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Task
+import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -33,7 +33,7 @@ fun HomeBottomBar(
             onClick = { clickableScreen.value = UserHomeScreens.TASKS }
         ) {
             Icon(
-                imageVector = Icons.Default.Task,
+                imageVector = Icons.Filled.DashboardCustomize,
                 contentDescription = "Home",
                 tint = if (clickableScreen.value == UserHomeScreens.TASKS) Color.Blue else Color.Gray,
                 modifier = Modifier.size(26.dp)
@@ -46,7 +46,7 @@ fun HomeBottomBar(
             }
         ) {
             Icon(
-                imageVector = Icons.Default.CalendarToday,
+                imageVector = Icons.Default.Today,
                 contentDescription = "Calendar",
                 tint = if (clickableScreen.value == UserHomeScreens.CALENDAR) Color.Blue else Color.Gray,
                 modifier = Modifier.size(26.dp)

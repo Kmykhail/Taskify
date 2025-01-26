@@ -14,8 +14,10 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.kote.taskifyapp.CLEANUP
+import com.kote.taskifyapp.DAILY_TASK_CHECK
 import com.kote.taskifyapp.DELAY_FOR_DELETE
 import com.kote.taskifyapp.KEY_DESCRIPTION
 import com.kote.taskifyapp.KEY_TITLE
@@ -24,6 +26,8 @@ import com.kote.taskifyapp.ReminderReceiver
 import com.kote.taskifyapp.data.worker.CompletedTaskWorker
 import com.kote.taskifyapp.data.worker.TaskCheckWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.time.Duration
+import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -73,25 +77,38 @@ class WorkManagerRepository @Inject constructor(
 
     // Daily check outdated tasks start
     fun scheduleDailyCheck() {
-        val constraints = Constraints.Builder()
-//            .setRequiresBatteryNotLow(false)
-//            .setRequiresCharging(false)
-            .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
-            .build()
+        val workInfos = workManager.getWorkInfosForUniqueWork(DAILY_TASK_CHECK).get()
+        val isAlreadyScheduled = workInfos.any {
+            it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.RUNNING
+        }
 
-        val dailyCheckRequest = PeriodicWorkRequestBuilder<TaskCheckWorker>(1, TimeUnit.DAYS)
-            .setConstraints(constraints)
-            .build()
+        if (!isAlreadyScheduled) {
+            val now = LocalTime.now()
+            val targetTime = LocalTime.of(11, 0)
+            val delay = Duration.between(now, targetTime).seconds.let {
+                if (it < 0) it + TimeUnit.DAYS.toSeconds(1) else it
+            }
 
-        workManager.enqueueUniquePeriodicWork(
-            "DailyTaskCheck",
-            ExistingPeriodicWorkPolicy.KEEP,
-            dailyCheckRequest
-        )
-        Log.d("Debug", "Daily check outdated tasks")
-        val workInfos = workManager.getWorkInfosForUniqueWork("DailyTaskCheck").get()
-        workInfos.forEach {
-            Log.d("Debug", "DailyTaskCheck state: ${it.state}")
+            val constraints = Constraints.Builder()
+                .setRequiresBatteryNotLow(false)
+                .setRequiresCharging(false)
+                .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+                .setRequiresDeviceIdle(false)
+                .build()
+
+            val dailyCheckRequest = PeriodicWorkRequestBuilder<TaskCheckWorker>(1, TimeUnit.DAYS)
+                .setConstraints(constraints)
+                .setInitialDelay(delay, TimeUnit.SECONDS)
+                .build()
+
+            workManager.enqueueUniquePeriodicWork(
+                DAILY_TASK_CHECK,
+                ExistingPeriodicWorkPolicy.KEEP,
+                dailyCheckRequest
+            )
+            Log.d("Debug", "Daily checking for outdated tasks is scheduled")
+        } else {
+            Log.d("Debug", "Daily checking for outdated tasks is in progress")
         }
     }
     // Daily check outdated tasks end

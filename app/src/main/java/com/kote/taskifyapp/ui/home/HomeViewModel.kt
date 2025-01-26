@@ -45,46 +45,45 @@ class HomeViewModel @Inject constructor(
     init {
         workRepository.scheduleDailyCheck()
         viewModelScope.launch {
-            repository.allTask
-                .combine(_tasksUiState) { tasks, uiState ->
-                    val currentDate = LocalDate.now()
-                    when (uiState.groupTasksType) {
-                        GroupTasksType.ALL -> {
-                            tasks.groupBy {
-                                when {
-                                    it.isCompleted -> "Completed"
-                                    it.date != null && convertMillisToDate(it.date) < currentDate -> "Outdated"
-                                    it.date == null -> "Not planned"
-                                    else -> "Active"
-                                }
+            repository.allTask.combine(_tasksUiState) { tasks, uiState ->
+                val currentDate = LocalDate.now()
+                when (uiState.groupTasksType) {
+                    GroupTasksType.ALL -> {
+                        tasks.groupBy {
+                            when {
+                                it.isCompleted -> "Completed"
+                                it.date != null && convertMillisToDate(it.date) < currentDate -> "Outdated"
+                                it.date == null -> "Not planned"
+                                else -> "Active"
                             }
                         }
-                        GroupTasksType.TODAY -> {
-                            tasks.filter { it.date != null && convertMillisToDate(it.date) <= currentDate }
-                                .groupBy {
-                                    when {
-                                        it.isCompleted -> "Completed"
-                                        convertMillisToDate(it.date!!) == currentDate -> "Today"
-                                        else -> "Outdated"
-                                    }
+                    }
+                    GroupTasksType.TODAY -> {
+                        tasks.filter { it.date != null && convertMillisToDate(it.date) <= currentDate }
+                            .groupBy {
+                                when {
+                                    it.isCompleted -> "Completed"
+                                    convertMillisToDate(it.date!!) == currentDate -> "Today"
+                                    else -> "Outdated"
                                 }
-                        }
-                        GroupTasksType.COMPLETED -> {
-                            mapOf("Completed" to tasks.filter { it.isCompleted })
-                        }
-                        GroupTasksType.PLANNED -> {
-                            mapOf("Planned" to tasks.filter {
-                                it.date != null && !it.isCompleted && convertMillisToDate(it.date) >= currentDate
-                            })
-                        }
-                        GroupTasksType.IMPORTANT -> {
-                            mapOf("Important" to tasks.filter { it.isFavorite })
-                        }
+                            }
+                    }
+                    GroupTasksType.COMPLETED -> {
+                        mapOf("Completed" to tasks.filter { it.isCompleted })
+                    }
+                    GroupTasksType.PLANNED -> {
+                        mapOf("Planned" to tasks.filter {
+                            it.date != null && !it.isCompleted && convertMillisToDate(it.date) >= currentDate
+                        })
+                    }
+                    GroupTasksType.IMPORTANT -> {
+                        mapOf("Important" to tasks.filter { it.isFavorite })
                     }
                 }
-                .collect { groupedTasks ->
-                    _groupedTasks.value = groupedTasks
-                }
+            }
+            .collect { groupedTasks ->
+                _groupedTasks.value = groupedTasks
+            }
         }
     }
 
