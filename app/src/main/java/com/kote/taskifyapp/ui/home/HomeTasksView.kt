@@ -49,6 +49,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -56,6 +57,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kote.taskifyapp.R
 import com.kote.taskifyapp.data.Priority
 import com.kote.taskifyapp.data.Task
 import java.time.Instant
@@ -87,7 +89,7 @@ fun HomeListView(
                     groupTasksType?.let {
                         if (it == GroupTasksType.COMPLETED) {
                             Text(
-                                "Completed tasks will be deleted after 30 days",
+                                text = stringResource(R.string.deletion_after_30_days),
                                 textAlign = TextAlign.Justify,
                                 modifier = Modifier.padding(horizontal = 10.dp)
                             )
@@ -144,7 +146,7 @@ fun TaskSection(
         }
     } else {
         Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
-            Text(text = "No reminders", fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.no_reminders), fontWeight = FontWeight.Bold)
         }
     }
 }

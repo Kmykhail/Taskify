@@ -43,7 +43,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.ui.components.CustomTextField
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import com.kote.taskifyapp.R
 import com.kote.taskifyapp.data.Priority
 import com.kote.taskifyapp.data.Task
 import java.util.concurrent.TimeUnit
@@ -77,7 +79,7 @@ fun TaskScreen(
     ) {
         CustomTextField(
             value = task.title ?: "",
-            placeholder = "Name",
+            placeholder = stringResource(R.string.name_textfield_placeholder),
             onValueChange = viewModel::updateTaskTitle,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             keyboardActions = KeyboardActions(onNext = { focusRequester2.requestFocus() }),
@@ -94,7 +96,7 @@ fun TaskScreen(
         ) {
             CustomTextField(
                 value = task.description ?: "",
-                placeholder = "Description",
+                placeholder = stringResource(R.string.description_textfield_placeholder),
                 onValueChange = viewModel::updateTaskDescription,
                 readOnly = task.isCompleted,
                 modifier = Modifier

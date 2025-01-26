@@ -1,3 +1,32 @@
 <resources>
     <string name="app_name">Taskify</string>
+
+    <string name="notification_pop_button_text">Settings</string>
+
+    <string name="side_panel_all">All</string>
+    <string name="side_panel_today">Today</string>
+    <string name="side_panel_planned">Planned</string>
+    <string name="side_panel_completed">Completed</string>
+
+    <string name="alert_dismiss">Dismiss</string>
+    <string name="alert_ok">Ok</string>
+
+    <string name="high_priority">High priority</string>
+    <string name="medium_priority">Medium priority</string>
+    <string name="low_priority">Low priority</string>
+    <string name="no_priority">No priority</string>
+
+    <string name="name_textfield_placeholder">Name</string>
+    <string name="description_textfield_placeholder">Description</string>
+
+    <string name="untitled">Untitled</string>
+    <string name="select_all">Select All</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="deletion_after_30_days">Completed tasks will be deleted after 30 days</string>
+    <string name="no_reminders">No reminders</string>
+
+    <string name="title_sort">Sort by title</string>
+    <string name="date_sort">Sort by date</string>
+    <string name="priority_sort">Sort by priority</string>
 </resources>

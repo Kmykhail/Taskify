@@ -8,6 +8,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.kote.taskifyapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,7 +22,7 @@ fun OpenTimerPicker(
         onDismissRequest = { updateTimerPicker(false) },
         dismissButton = {
             TextButton(onClick = { updateTimerPicker(false) }) {
-                Text("Dismiss")
+                Text(stringResource(R.string.alert_dismiss))
             }
         },
         confirmButton = {
@@ -30,7 +32,7 @@ fun OpenTimerPicker(
                     onSelectTime(timePickerState.hour * 60 + timePickerState.minute)
                     updateTimerPicker(false)
                 }
-            ) { Text("OK") }
+            ) { Text(stringResource(R.string.alert_ok)) }
         },
         text = { TimePicker(state = timePickerState) }
     )

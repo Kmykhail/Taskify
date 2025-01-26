@@ -51,7 +51,7 @@ fun HomeScreen(
             scope = scope,
             selectedFilterType = tasksUiState!!.groupTasksType,
             onSelectedFilterType = { viewModel.setGroupTasksType(it) },
-            gestureEnabled = tasksUiState!!.userHomeScreens == UserHomeScreens.TASKS,//userHomeScreens.value == UserHomeScreens.TASKS,
+            gestureEnabled = tasksUiState!!.userHomeScreens == UserHomeScreens.TASKS,
             modifier = modifier
         ) {
             Scaffold(

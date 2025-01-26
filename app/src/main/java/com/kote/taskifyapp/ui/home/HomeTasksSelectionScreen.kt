@@ -22,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -30,8 +29,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.kote.taskifyapp.R
 import com.kote.taskifyapp.data.Task
 import com.kote.taskifyapp.ui.components.CustomCheckBox
 
@@ -129,7 +130,7 @@ private fun ShowTasks(
                         onCheckedChange = {onToggleTaskSelection(task.id)}
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = task.title ?: "Untitled")
+                    Text(text = task.title ?: stringResource(R.string.untitled))
                 }
             }
         }
@@ -152,7 +153,7 @@ private fun BottomBar(
         TextButton(onClick = {
             isSelectAll = !isSelectAll
             updateSelectAll(isSelectAll)
-        }) { Text(text = if (!isSelectAll) "Select All" else "Cancel") }
+        }) { Text(text = if (!isSelectAll) stringResource(R.string.select_all) else stringResource(R.string.cancel)) }
         IconButton(
             onClick = { deleteSelectedTasks() },
             enabled = selectedTasks,
