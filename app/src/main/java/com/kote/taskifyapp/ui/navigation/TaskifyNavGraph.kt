@@ -27,7 +27,7 @@ fun TaskifyNavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    var userScreens by remember { mutableStateOf(UserHomeScreens.TASKS) }
+    var userScreens = remember { mutableStateOf(UserHomeScreens.TASKS) }
 
     NavHost(
         navController = navController,
@@ -37,7 +37,6 @@ fun TaskifyNavGraph(
             HomeScreen(
                 viewModel = hiltViewModel<HomeViewModel>(),
                 userHomeScreens = userScreens,
-                updateHomeScreens =  {userScreens = it},
                 onNavigateToTaskDetails = { taskId, date ->
                     navController.navigate("details/$taskId?date=$date")
                 },

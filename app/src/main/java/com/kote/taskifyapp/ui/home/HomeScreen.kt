@@ -12,8 +12,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,11 +26,14 @@ import com.kote.taskifyapp.ui.components.SidePanel
 import com.kote.taskifyapp.ui.navigation.UserHomeScreens
 import kotlinx.coroutines.launch
 
+enum class SidePanelOptions {
+    ALL, TODAY, PLANNED, COMPLETED, IMPORTANT
+}
+
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    userHomeScreens: UserHomeScreens,
-    updateHomeScreens: (UserHomeScreens) -> Unit,
+    userHomeScreens: MutableState<UserHomeScreens>,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
     modifier: Modifier = Modifier
@@ -41,13 +47,15 @@ fun HomeScreen(
     SidePanel(
         drawerState = drawerState,
         scope = scope,
+        selectedFilterType = tasksUiState.taskFilterType,
+        onSelectedFilterType = viewModel::setFilterType,
         modifier = modifier
     ) {
         Scaffold(
             topBar = {
-                if (userHomeScreens == UserHomeScreens.TASKS) {
+                if (userHomeScreens.value == UserHomeScreens.TASKS) {
                     HomeTopBar(
-                        filterType = tasksUiState.filterType,
+                        taskFilterType = tasksUiState.taskFilterType,
                         onSortChange = viewModel::setSortType,
                         onFiltrationChange = viewModel::setFilterType,
                         onSwitchView = {},
@@ -61,7 +69,6 @@ fun HomeScreen(
             bottomBar = {
                 HomeBottomBar(
                     clickableScreen = userHomeScreens,
-                    onClick = {updateHomeScreens(it)},
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp, bottom = 24.dp, start = 32.dp, end = 32.dp)
@@ -84,7 +91,7 @@ fun HomeScreen(
                 }
             }
         ) { paddingValues ->
-            when (userHomeScreens) {
+            when (userHomeScreens.value) {
                 UserHomeScreens.TASKS -> {
                     HomeListView(
                         tasks = tasks,

@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material.icons.filled.Task
-import androidx.compose.material.icons.outlined.Task
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -28,15 +26,15 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun HomeTopBar(
-    filterType: FilterType,
+    taskFilterType: TaskFilterType,
     onSortChange: (SortType) -> Unit,
-    onFiltrationChange: (FilterType) -> Unit,
+    onFiltrationChange: (TaskFilterType) -> Unit,
     onSwitchView: () -> Unit,
     onOpenSidePanel: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var pendingFilterUpdate by remember { mutableStateOf<FilterType?>(null) }
+    var pendingFilterUpdate by remember { mutableStateOf<TaskFilterType?>(null) }
 
     LaunchedEffect(expanded) {
         if (!expanded && pendingFilterUpdate != null) {
@@ -71,25 +69,25 @@ fun HomeTopBar(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
-                if (filterType == FilterType.SHOW_ACTIVE) {
-                    DropdownMenuItem(
-                        text = { Text("Show completed") },
-                        leadingIcon = { Icon(imageVector = Icons.Filled.Task, contentDescription = null) },
-                        onClick = {
-                            expanded = false
-                            pendingFilterUpdate = FilterType.SHOW_COMPLETED
-                        }
-                    )
-                } else {
-                    DropdownMenuItem(
-                        text = { Text("Hide completed") },
-                        leadingIcon = { Icon(imageVector = Icons.Outlined.Task, contentDescription = null) },
-                        onClick = {
-                            expanded = false
-                            pendingFilterUpdate = FilterType.SHOW_ACTIVE
-                        }
-                    )
-                }
+//                if (taskFilterType == TaskFilterType.SHOW_ACTIVE) {
+//                    DropdownMenuItem(
+//                        text = { Text("Show completed") },
+//                        leadingIcon = { Icon(imageVector = Icons.Filled.Task, contentDescription = null) },
+//                        onClick = {
+//                            expanded = false
+//                            pendingFilterUpdate = TaskFilterType.SHOW_COMPLETED
+//                        }
+//                    )
+//                } else {
+//                    DropdownMenuItem(
+//                        text = { Text("Hide completed") },
+//                        leadingIcon = { Icon(imageVector = Icons.Outlined.Task, contentDescription = null) },
+//                        onClick = {
+//                            expanded = false
+//                            pendingFilterUpdate = TaskFilterType.SHOW_ACTIVE
+//                        }
+//                    )
+//                }
                 DropdownMenuItem(
                     text = { Text("Sort by title") },
                     onClick = {

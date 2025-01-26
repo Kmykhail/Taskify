@@ -50,7 +50,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.data.Task
 
@@ -68,21 +70,32 @@ fun HomeListView(
             .padding(paddingValues)
             .fillMaxSize()
     ) {
-        ShowTasks(
-            tasks = tasks.filter { !it.isCompleted },
-            title = "Active",
-            onNavigateToTaskDetails = onNavigateToTaskDetails,
-            onNavigateToSelectionScreen = onNavigateToSelectionScreen,
-            markAsCompleted = markAsCompleted
-        )
 
-        if (tasksUiState.filterType == FilterType.SHOW_COMPLETED) {
-            ShowTasks(
-                tasks = tasks.filter { it.isCompleted },
-                title = "Completed",
-                onNavigateToTaskDetails = onNavigateToTaskDetails,
-                onNavigateToSelectionScreen = onNavigateToSelectionScreen
-            )
+        when (tasksUiState.taskFilterType) {
+            TaskFilterType.ALL -> {
+                ShowTasks(
+                    tasks = tasks.filter { !it.isCompleted },
+                    title = "Active",
+                    onNavigateToTaskDetails = onNavigateToTaskDetails,
+                    onNavigateToSelectionScreen = onNavigateToSelectionScreen,
+                    markAsCompleted = markAsCompleted
+                )
+                ShowTasks(
+                    tasks = tasks.filter { it.isCompleted },
+                    title = "Completed",
+                    onNavigateToTaskDetails = onNavigateToTaskDetails,
+                    onNavigateToSelectionScreen = onNavigateToSelectionScreen
+                )
+            }
+            else -> {
+                ShowTasks(
+                    tasks = tasks,
+                    title = tasksUiState.taskFilterType.name.lowercase().replaceFirstChar { it.uppercase() },
+                    onNavigateToTaskDetails = onNavigateToTaskDetails,
+                    onNavigateToSelectionScreen = onNavigateToSelectionScreen,
+                    markAsCompleted = markAsCompleted
+                )
+            }
         }
     }
 }
@@ -99,7 +112,6 @@ private fun ShowTasks(
     if (tasks.isEmpty()) return
 
     var isExpanded by remember { mutableStateOf(true) }
-    val listState = rememberLazyListState()
 
     val transition = updateTransition(targetState = isExpanded, label = "expandTransition")
     val iconRotation by transition.animateFloat(
@@ -130,6 +142,7 @@ private fun ShowTasks(
                 )
             }
         }
+
         AnimatedVisibility(
             visible = isExpanded,
             enter = fadeIn() + expandVertically(),
@@ -137,7 +150,12 @@ private fun ShowTasks(
         ) {
             LazyColumn {
                 items(tasks) { task ->
-                    TaskItem(task, onNavigateToTaskDetails, onNavigateToSelectionScreen, markAsCompleted, title == "Active")
+                    TaskItem(
+                        task = task,
+                        onNavigateToTaskDetails = onNavigateToTaskDetails,
+                        onNavigateToSelectionScreen = onNavigateToSelectionScreen,
+                        markAsCompleted = markAsCompleted,
+                    )
                 }
             }
         }
@@ -151,7 +169,6 @@ private fun TaskItem(
     onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
     markAsCompleted: (Int) -> Unit,
-    enabled: Boolean,
 ) {
     val context = LocalContext.current
 
@@ -184,10 +201,13 @@ private fun TaskItem(
     ) {
         Checkbox(
             checked = task.isCompleted,
-            onCheckedChange = { if (enabled) markAsCompleted(task.id) },
-            enabled = enabled
+            onCheckedChange = { if (!task.isCompleted) markAsCompleted(task.id) },
+            enabled = !task.isCompleted
         )
-        Text(text = task.title ?: "Untitled")
+        Text(
+            text = task.title ?: "Untitled",
+            style = TextStyle(textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None)
+        )
         Spacer(modifier = Modifier.weight(1f))
         if (task.time != null) {
             Icon(
