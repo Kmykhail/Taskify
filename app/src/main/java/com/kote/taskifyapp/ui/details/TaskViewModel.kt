@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kote.taskifyapp.data.Priority
 import com.kote.taskifyapp.data.Task
-import com.kote.taskifyapp.data.repository.ReminderManagerRepository
+import com.kote.taskifyapp.data.repository.WorkManagerRepository
 import com.kote.taskifyapp.data.repository.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +20,7 @@ import javax.inject.Inject
 class TaskViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: TaskRepository,
-    private val reminderRepository: ReminderManagerRepository
+    private val workRepository: WorkManagerRepository
 ) : ViewModel() {
 
     private val _taskState = MutableStateFlow<Task>(Task())
@@ -41,7 +41,7 @@ class TaskViewModel @Inject constructor(
         viewModelScope.launch {
             _taskState.value.run {
                 if (date != null && time != null) {
-                    reminderRepository.scheduleNotification(id, title, description, calculateReminderTime(date, time))
+                    workRepository.scheduleNotification(id, title, description, calculateReminderTime(date, time))
                 }
                 if (isCreated) {
                     repository.updateTask(_taskState.value)
@@ -63,7 +63,7 @@ class TaskViewModel @Inject constructor(
     }
 
     fun removeReminder(id: Int) {
-        reminderRepository.removeNotification(id)
+        workRepository.removeNotification(id)
     }
 
     fun getTaskPriorityColor(): Color {

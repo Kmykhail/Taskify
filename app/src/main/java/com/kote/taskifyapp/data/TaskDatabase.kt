@@ -14,7 +14,7 @@ abstract class TaskDatabase : RoomDatabase() {
 
     companion object {
         private var INSTANCE: TaskDatabase? = null
-        fun gerDataBase(context: Context): TaskDatabase {
+        fun getDataBase(context: Context): TaskDatabase {
             return INSTANCE ?: synchronized(this) {
                 Room.databaseBuilder(context, TaskDatabase::class.java, "task_database")
                 .fallbackToDestructiveMigration()

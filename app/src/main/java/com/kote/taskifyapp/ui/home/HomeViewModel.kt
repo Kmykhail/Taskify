@@ -2,8 +2,10 @@ package com.kote.taskifyapp.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kote.taskifyapp.DELAY_FOR_DELETE
 import com.kote.taskifyapp.data.Task
 import com.kote.taskifyapp.data.repository.TaskRepository
+import com.kote.taskifyapp.data.repository.WorkManagerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,7 +21,8 @@ enum class SortType {
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val repository: TaskRepository
+    private val repository: TaskRepository,
+    private val workRepository: WorkManagerRepository
 ) : ViewModel() {
     private val _sortType = MutableStateFlow(SortType.DATE)
 
@@ -39,11 +42,20 @@ class HomeViewModel @Inject constructor(
 
     fun setSortType(sortType: SortType) { _sortType.value = sortType }
 
+    fun getNumberActiveTasks(): Int {
+        return tasks.value.count { !it.isCompleted }
+    }
+
     fun markAsCompleted(taskId: Int) {
         viewModelScope.launch {
             tasks.value.find { it.id == taskId }?.let {
-                val updated = it.copy(isCompleted = true)
+                val updated = it.copy(
+                    isCompleted = true,
+                    deletionTime = System.currentTimeMillis() + DELAY_FOR_DELETE
+                )
                 repository.updateTask(updated)
+
+                workRepository.scheduleCompletedTask(taskId)
             }
         }
     }
