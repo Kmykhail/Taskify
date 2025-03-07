@@ -215,7 +215,6 @@ private fun TaskItem(
         textStyleEffect = TextStyle(textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None),
         modifier = Modifier
            .padding(vertical = 2.dp)
-           .padding(end = 16.dp)
            .fillMaxWidth()
            .combinedClickable(
                onClick = { onNavigateToTaskDetails(task.id.toString(), null) },
