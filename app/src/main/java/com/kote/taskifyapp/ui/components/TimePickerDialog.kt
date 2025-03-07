@@ -26,7 +26,7 @@ import com.kote.taskifyapp.R
 fun TimerPickerDialog(
     timePickerState: TimePickerState,
     onConfirmation: () -> Unit,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
 ) {
     Dialog(onDismissRequest = onDismissRequest) {
         Card(shape = RoundedCornerShape(16.dp)) {

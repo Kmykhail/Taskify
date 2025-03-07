@@ -8,6 +8,7 @@ import com.kote.taskifyapp.data.Task
 import com.kote.taskifyapp.data.repository.TaskRepository
 import com.kote.taskifyapp.data.repository.UserPreferencesRepository
 import com.kote.taskifyapp.data.repository.WorkManagerRepository
+import com.kote.taskifyapp.util.convertLocalDateToMillis
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -64,7 +65,7 @@ class HomeViewModel @Inject constructor(
     val allCalendarTasks = _allCalendarTasks.asStateFlow()
 
     private val groupOrder = listOf("Completed", "Overdue", "Not planned", "Active", "Today", "Planned")
-    private val today = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+    private val today = LocalDate.now()
 
     init {
         workRepository.scheduleDailyCheckAlarm()
@@ -174,8 +175,8 @@ class HomeViewModel @Inject constructor(
         _tasksUiState.update { it?.copy(userHomeScreens = homeScreen) }
     }
 
-    fun setSelectedDay(selectedDate: Long) {
-        _tasksUiState.update { it?.copy(selectedDate = selectedDate) }
+    fun setSelectedDay(selectedDate: LocalDate) {
+        _tasksUiState.update { it?.copy(selectedDate = convertLocalDateToMillis(selectedDate)) }
     }
 
     fun deleteSelectedTasks(selectedTaskIds: Set<Int>) {
@@ -201,7 +202,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun allowTaskCreation() : Boolean {
-        return !(_tasksUiState.value?.userHomeScreens == UserHomeScreens.TASKS && _tasksUiState.value?.groupTasksType == GroupTasksType.COMPLETED)
+        return _tasksUiState.value?.userHomeScreens != UserHomeScreens.SETTINGS
     }
 
     private fun convertMillisToDate(date: Long): LocalDate {

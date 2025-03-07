@@ -23,11 +23,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.ui.components.SidePanel
+import com.kote.taskifyapp.ui.settings.SettingsViewModel
+import com.kote.taskifyapp.util.convertMillisToLocalDate
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneId
 
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel,
+    settingsViewModel: SettingsViewModel,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
     modifier: Modifier = Modifier
@@ -35,8 +40,18 @@ fun HomeScreen(
     val groupedTasks by homeViewModel.groupedTasks.collectAsState()
     val allCalendarTasks by homeViewModel.allCalendarTasks.collectAsState()
     val tasksUiState by homeViewModel.tasksUiState.collectAsState()
+    val settingsUiState by settingsViewModel.settingsUiState.collectAsState()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
+//    if (settingsUiState.taskViewType == TaskViewType.VerticalGrid) {
+//        val language  = "de"
+//        val locale = Locale(language)
+//        Locale.setDefault(locale)
+//        val config = Configuration()
+//        config.setLocale(locale)
+//        context.resources.updateConfiguration(config, context.resources.displayMetrics)
+//    }
 
     DisposableEffect(Unit) {
         Log.d("Debug", "HomeScreen Entered")
@@ -111,7 +126,7 @@ fun HomeScreen(
                     UserHomeScreens.CALENDAR -> {
                         HomeCalendarView(
                             groupedTasks = allCalendarTasks,
-                            selectedDate = tasksUiState!!.selectedDate!!,
+                            selectedDate = convertMillisToLocalDate(tasksUiState!!.selectedDate!!),
                             setSelectedDate = { homeViewModel.setSelectedDay(it) },
                             onNavigateToTaskDetails = onNavigateToTaskDetails,
                             markAsCompleted = homeViewModel::markAsCompleted,
@@ -120,7 +135,9 @@ fun HomeScreen(
                     }
                     UserHomeScreens.SETTINGS -> {
                         SettingsView(
-                            cancelDailyTaskCheck= homeViewModel::cancelDailyCheck
+                            settingsUiState = settingsUiState,
+                            setSettings = settingsViewModel::setSettings,
+                            modifier = modifier.padding(paddingValues)
                         )
                     }
                 }
