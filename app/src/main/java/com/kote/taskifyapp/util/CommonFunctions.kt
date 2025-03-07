@@ -1,5 +1,9 @@
 package com.kote.taskifyapp.util
 
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.Calendar
 
 fun calculateReminderTime(dateInMillis: Long, timeInMinutes: Int): Long {
@@ -12,4 +16,12 @@ fun calculateReminderTime(dateInMillis: Long, timeInMinutes: Int): Long {
     }
     val timeInMillis = timeInMinutes * 60 * 1000L
     return calendar.timeInMillis + timeInMillis
+}
+
+fun convertLocalDateToMillis(date: LocalDate): Long {
+    return date.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+}
+
+fun convertMillisToLocalDate(dayMillis: Long): LocalDate {
+    return Instant.ofEpochMilli(dayMillis).atZone(ZoneId.systemDefault()).toLocalDate()
 }

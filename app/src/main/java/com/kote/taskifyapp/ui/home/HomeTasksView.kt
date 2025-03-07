@@ -18,7 +18,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -79,28 +78,26 @@ fun HomeListView(
     ) {
         val firstKey = groupedTasks.keys.firstOrNull()
         groupedTasks.forEach { (title, taskList) ->
-            if (taskList.isNotEmpty()) {
-                item {
-                    if (firstKey != title) Spacer(modifier = Modifier.height(20.dp))
-                    groupTasksType?.let {
-                        if (it == GroupTasksType.COMPLETED) {
-                            Text(
-                                text = stringResource(R.string.deletion_after_30_days),
-                                textAlign = TextAlign.Justify,
-                                modifier = Modifier.padding(horizontal = 10.dp)
-                            )
-                        }
+            item {
+                if (firstKey != title) Spacer(modifier = Modifier.height(20.dp))
+                groupTasksType?.let {
+                    if (it == GroupTasksType.COMPLETED) {
+                        Text(
+                            text = stringResource(R.string.deletion_after_30_days),
+                            textAlign = TextAlign.Justify,
+                            modifier = Modifier.padding(horizontal = 10.dp)
+                        )
                     }
-                    TaskSection(
-                        title = title,
-                        tasks = taskList,
-                        isExpanded = expandedStates.getOrPut(title) { true },
-                        onToggleExpand = { expandedStates[title] = !expandedStates[title]!! },
-                        onNavigateToTaskDetails = onNavigateToTaskDetails,
-                        onNavigateToSelectionScreen = onNavigateToSelectionScreen,
-                        markAsCompleted = markAsCompleted
-                    )
                 }
+                TaskSection(
+                    title = title,
+                    tasks = taskList,
+                    isExpanded = expandedStates.getOrPut(title) { true },
+                    onToggleExpand = { expandedStates[title] = !expandedStates[title]!! },
+                    onNavigateToTaskDetails = onNavigateToTaskDetails,
+                    onNavigateToSelectionScreen = onNavigateToSelectionScreen,
+                    markAsCompleted = markAsCompleted
+                )
             }
         }
     }
@@ -139,10 +136,6 @@ fun TaskSection(
                     }
                 }
             }
-        }
-    } else {
-        Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
-            Text(text = stringResource(R.string.no_reminders), fontWeight = FontWeight.Bold)
         }
     }
 }

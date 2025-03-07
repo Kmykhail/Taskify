@@ -1,6 +1,7 @@
 package com.kote.taskifyapp.ui.home
 
 import android.util.Log
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -28,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -35,32 +37,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.data.Task
-import java.time.Instant
+import com.kote.taskifyapp.ui.theme.TaskifyTheme
+import com.kote.taskifyapp.util.convertMillisToLocalDate
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
-import java.time.ZoneId
-import java.time.ZoneOffset
 
 @Composable
 fun HomeCalendarView(
     groupedTasks: Map<String, List<Task>>,
-    selectedDate: Long,
-    setSelectedDate: (Long) -> Unit,
+    selectedDate: LocalDate,
+    setSelectedDate: (LocalDate) -> Unit,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     markAsCompleted: (String, Int) -> Unit,
     paddingValues: PaddingValues = PaddingValues(0.dp),
 ) {
+    val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(initialPage = Short.MAX_VALUE / 2, pageCount = { Short.MAX_VALUE.toInt() })
     var dateString by remember { mutableStateOf("") }
 
     LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.currentPage }
-            .collect {page ->
-                val yearMonth = YearMonth.now().plusMonths(page - (Short.MAX_VALUE / 2).toLong())
-                dateString = "${yearMonth.month} ${yearMonth.year}"
-            }
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            val currentMonth = YearMonth.now().plusMonths(page - (Short.MAX_VALUE / 2).toLong())
+            dateString = "${currentMonth.month.name.lowercase().replaceFirstChar { it.uppercase() }} ${currentMonth.year}"
+        }
     }
 
     Column(
@@ -94,10 +97,16 @@ fun HomeCalendarView(
                 .fillMaxSize()
                 .padding(vertical = 10.dp)
         ) { page ->
+            val displayedMonth = YearMonth.now().plusMonths(page.toLong() - (Short.MAX_VALUE / 2).toLong())
             CalendarView(
-                month = YearMonth.now().plusMonths(page - (Short.MAX_VALUE / 2).toLong()),
+                month = displayedMonth,
+                onMonthChanges = {
+                    scope.launch {
+                        pagerState.animateScrollToPage(page = pagerState.currentPage + it, animationSpec = tween(durationMillis = 300))
+                    }
+                },
+                onSelectedDate = { setSelectedDate(it)  },
                 selectedDate = selectedDate,
-                onSelectedDate = setSelectedDate,
                 groupedTasks = groupedTasks,
                 onNavigateToTaskDetails = onNavigateToTaskDetails,
                 markAsCompleted = markAsCompleted
@@ -109,23 +118,45 @@ fun HomeCalendarView(
 @Composable
 private fun CalendarView(
     month: YearMonth,
-    selectedDate: Long,
-    onSelectedDate: (Long) -> Unit,
+    onMonthChanges: (Int) -> Unit,
+    onSelectedDate: (LocalDate) -> Unit,
+    selectedDate: LocalDate,
     groupedTasks: Map<String, List<Task>>,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     markAsCompleted: (String, Int) -> Unit,
 ) {
-    val nowMillis = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+    val todayDate = LocalDate.now()
+    val dateList = remember(month) {
+        val previousMonth = month.minusMonths(1)
+        val nextMonth = month.plusMonths(1)
+        val daysFromPrevMonth = month.atDay(1).dayOfWeek.value - 1
+        val daysInCurrentMonth: Int = month.lengthOfMonth()
 
-    val daysInMonth = month.lengthOfMonth()
-    val daysList = remember(month){ (1 .. daysInMonth).map { month.atDay(it).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() } }
-    val groupedTasksByDate = remember(groupedTasks, daysList) {
-        val map = mutableStateMapOf<Long, MutableMap<String, MutableList<Task>>>()
+        val totalCells = 7 * 6
+        val daysFromNextMonth = totalCells - (daysInCurrentMonth + daysFromPrevMonth)
+
+        buildList<LocalDate> {
+            for (day in (previousMonth.lengthOfMonth() - daysFromPrevMonth + 1)..previousMonth.lengthOfMonth()) {
+                add(previousMonth.atDay(day))
+            }
+
+            for (day in 1 .. daysInCurrentMonth) {
+                add(month.atDay(day))
+            }
+
+            for (day in 1 .. daysFromNextMonth) {
+                add(nextMonth.atDay(day))
+            }
+        }
+    }
+    val groupedTasksByDate = remember(groupedTasks, dateList) {
+        val map = mutableStateMapOf<LocalDate, MutableMap<String, MutableList<Task>>>()
         groupedTasks.forEach { (group, tasks) ->
             tasks.forEach { task ->
                 if (task.date != null) {
-                    daysList.find { task.date == it }?.let {
-                        map.getOrPut(task.date) { mutableMapOf() }.getOrPut(group) { mutableListOf() }.add(task)
+                    val taskDate = convertMillisToLocalDate(task.date)
+                    dateList.find { taskDate == it }?.let {
+                        map.getOrPut(taskDate) { mutableMapOf() }.getOrPut(group) { mutableListOf() }.add(task)
                     }
                 }
             }
@@ -140,79 +171,89 @@ private fun CalendarView(
     ) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier
                 .padding(horizontal = 6.dp)
                 .padding(bottom = 6.dp)
         ) {
-            items(daysList, key = {it}) { dayMillis ->
-                Column (
+            items(dateList, key = {it}) { date ->
+                Column(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .clip(CircleShape)
-                        .background(color = when (dayMillis) {
-                                selectedDate -> if (selectedDate >= nowMillis) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-                                nowMillis -> MaterialTheme.colorScheme.secondaryContainer //MaterialTheme.colorScheme.surfaceContainerLowest
-                                else -> Color.Transparent
-                            }
-                        )
+                        .background(color = when (date) {
+                            selectedDate -> if (selectedDate >= todayDate) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                            todayDate -> MaterialTheme.colorScheme.secondaryContainer
+                            else -> Color.Transparent
+                        })
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
-                            onClick = { onSelectedDate(dayMillis) }
-                        )
-                        .size(42.dp)
+                            onClick = {
+                                Log.d("Debug", "click by date: ${date}")
+                                onSelectedDate(date)
+                                if (date.month != month.month) {
+                                    onMonthChanges(if (date.isBefore(month.atDay(1))) -1 else 1)
+                                }
+                            })
+                        .size(44.dp)
                 ) {
                     Text(
-                        text = Instant.ofEpochMilli(dayMillis).atZone(ZoneId.systemDefault()).toLocalDate().dayOfMonth.toString(),
+                        text = date.dayOfMonth.toString(),
                         textAlign = TextAlign.Center,
-                        color = when (dayMillis) {
+                        color = when (date) {
                             selectedDate -> MaterialTheme.colorScheme.surfaceContainerLowest
-                            nowMillis -> MaterialTheme.colorScheme.primary
-                            else -> MaterialTheme.colorScheme.onSurface
+                            todayDate -> MaterialTheme.colorScheme.primary
+                            else -> {
+                                if (date.month == month.month) {
+                                    MaterialTheme.colorScheme.onSurface
+                                } else {
+                                    MaterialTheme.colorScheme.outlineVariant
+                                }
+                            }
                         }
                     )
                     Icon(
                         imageVector = Icons.Default.Circle,
-                        tint = if (groupedTasksByDate.contains(dayMillis) && selectedDate != dayMillis) MaterialTheme.colorScheme.primary else Color.Transparent,
+                        tint = if (groupedTasksByDate.contains(date) && selectedDate != date) MaterialTheme.colorScheme.primary else Color.Transparent,
                         contentDescription = null,
-                        modifier = Modifier
-                            .size(4.dp)
+                        modifier = Modifier.size(4.dp)
                     )
                 }
             }
         }
 
         groupedTasksByDate[selectedDate]?.toMap()?.let {
-            HomeListView(
-                groupedTasks = it,
-                onNavigateToTaskDetails = onNavigateToTaskDetails,
-                onNavigateToSelectionScreen = {},
-                markAsCompleted = markAsCompleted,
-            )
+            if (month.month == selectedDate.month) {
+                HomeListView(
+                    groupedTasks = it,
+                    onNavigateToTaskDetails = onNavigateToTaskDetails,
+                    onNavigateToSelectionScreen = {},
+                    markAsCompleted = markAsCompleted,
+                )
+            }
         }
     }
 }
 
-//@Preview
-//@Composable
-//fun HomeCalendarPreview() {
-//    TaskifyTheme {
-//        val selectedDate = remember { mutableStateOf<Long?>(null) }
-//        HomeCalendarView(
-//            groupedTasks = mapOf(
-//                "Activity" to listOf(
-//                        Task(date = 1740009600000),
-//                        Task(date = 1740009600000),
-//                        Task(date = 1738540800000),
-//                        Task(date = 1739836800000)
-//                    )
-//            ),
-//            previousSelectedDate = selectedDate,
-//            onNavigateToTaskDetails = { _, _ ->  },
-//            markAsCompleted = { _, _ -> }
-//        )
-//    }
-//}
+@Preview
+@Composable
+fun HomeCalendarPreview() {
+    TaskifyTheme {
+        HomeCalendarView(
+            groupedTasks = mapOf(
+                "Activity" to listOf(
+                    Task(date = 1740009600000),
+                    Task(date = 1740009600000),
+                    Task(date = 1738540800000),
+                    Task(date = 1739836800000)
+                )
+            ),
+            onNavigateToTaskDetails = { _, _ -> },
+            markAsCompleted = { _, _ -> },
+            selectedDate = LocalDate.now(),
+            setSelectedDate = {},
+        )
+    }
+}
