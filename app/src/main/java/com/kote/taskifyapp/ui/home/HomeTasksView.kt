@@ -18,6 +18,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -36,6 +37,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -155,15 +157,15 @@ private fun SectionHeader(
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onToggleExpand)
-            .padding(horizontal = 12.dp)
+            .padding(horizontal = 12.dp, vertical = 2.dp)
     ) {
         Text(text = title, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.weight(1f))
-        Text("$taskCount")
-        IconButton(onClick = onToggleExpand) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("$taskCount")
             Icon(
                 imageVector = Icons.Default.ArrowDropDown,
                 contentDescription = "Expand/Collapse",
