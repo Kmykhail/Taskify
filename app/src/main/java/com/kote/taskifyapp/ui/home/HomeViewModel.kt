@@ -74,7 +74,7 @@ class HomeViewModel @Inject constructor(
             val initialType = userPreferencesRepository.groupTaskTypeFlow.first()
             _tasksUiState.value = TasksUiState(groupTasksType = initialType)
             if (initialType == GroupTasksType.TODAY) {
-                setSelectedDay(today)
+                setSelectedDay(convertLocalDateToMillis(today))
             }
         }
 
@@ -155,7 +155,7 @@ class HomeViewModel @Inject constructor(
         return if (_tasksUiState.value!!.userHomeScreens == UserHomeScreens.CALENDAR) {
             return _tasksUiState.value!!.selectedDate?.toString()
         } else if (_tasksUiState.value!!.userHomeScreens == UserHomeScreens.TASKS && _tasksUiState.value!!.groupTasksType == GroupTasksType.TODAY) {
-            return today.toString()
+            return convertLocalDateToMillis(today).toString()
         } else {
             null
         }
@@ -170,13 +170,13 @@ class HomeViewModel @Inject constructor(
 
     fun setUserHomeScreens(homeScreen: UserHomeScreens) {
         if (homeScreen == UserHomeScreens.CALENDAR && _tasksUiState.value?.selectedDate == null) {
-            setSelectedDay(today)
+            setSelectedDay(convertLocalDateToMillis(today))
         }
         _tasksUiState.update { it?.copy(userHomeScreens = homeScreen) }
     }
 
-    fun setSelectedDay(selectedDate: LocalDate) {
-        _tasksUiState.update { it?.copy(selectedDate = convertLocalDateToMillis(selectedDate)) }
+    fun setSelectedDay(selectedDate: Long) {
+        _tasksUiState.update { it?.copy(selectedDate = selectedDate) }
     }
 
     fun deleteSelectedTasks(selectedTaskIds: Set<Int>) {

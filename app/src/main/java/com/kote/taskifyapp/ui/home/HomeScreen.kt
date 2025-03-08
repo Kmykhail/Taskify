@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.ui.components.SidePanel
 import com.kote.taskifyapp.ui.settings.SettingsViewModel
+import com.kote.taskifyapp.util.convertLocalDateToMillis
 import com.kote.taskifyapp.util.convertMillisToLocalDate
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -127,7 +128,7 @@ fun HomeScreen(
                         HomeCalendarView(
                             groupedTasks = allCalendarTasks,
                             selectedDate = convertMillisToLocalDate(tasksUiState!!.selectedDate!!),
-                            setSelectedDate = { homeViewModel.setSelectedDay(it) },
+                            setSelectedDate = { homeViewModel.setSelectedDay(convertLocalDateToMillis(it)) },
                             onNavigateToTaskDetails = onNavigateToTaskDetails,
                             markAsCompleted = homeViewModel::markAsCompleted,
                             paddingValues = paddingValues
