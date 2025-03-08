@@ -28,7 +28,8 @@ import java.time.format.DateTimeFormatter
 fun TaskSummary(
     task: Task,
     checkBox: @Composable () -> Unit,
-    textStyleEffect: TextStyle = TextStyle(),
+    checkBoxTextStyleEffect: TextStyle = TextStyle(),
+    isOverdue: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -39,7 +40,7 @@ fun TaskSummary(
         checkBox()
         Text(
             text = task.title ?: stringResource(R.string.untitled),
-            style = textStyleEffect,
+            style = checkBoxTextStyleEffect,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
@@ -53,12 +54,19 @@ fun TaskSummary(
                 Text(
                     text = "${taskLocalDate.format(DateTimeFormatter.ofPattern("MMM"))} ${taskLocalDate.dayOfMonth}",
                     fontSize = 12.sp,
+                    color = if (isOverdue) Color(0xFFAF2A2A) else MaterialTheme.colorScheme.onSurface
                 )
             }
+            val iconColor = if (task.time != null) {
+                if (isOverdue) Color(0xFFAF2A2A) else MaterialTheme.colorScheme.onSurface
+            } else {
+                Color.Transparent
+            }
+
             Icon(
                 imageVector = Icons.Default.AccessTime,
                 contentDescription = "Clock",
-                tint = if (task.time != null) MaterialTheme.colorScheme.onSurface else Color.Transparent,
+                tint = iconColor,
                 modifier = Modifier
                     .size(16.dp)
             )

@@ -34,10 +34,8 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -131,6 +129,7 @@ fun TaskSection(
                     tasks.forEach { task ->
                         TaskItem(
                             task = task,
+                            isOverdue = title == "Overdue",
                             onNavigateToTaskDetails = onNavigateToTaskDetails,
                             onNavigateToSelectionScreen = onNavigateToSelectionScreen,
                             markAsCompleted = {markAsCompleted(title, task.id)}
@@ -179,6 +178,7 @@ private fun SectionHeader(
 @Composable
 private fun TaskItem(
     task: Task,
+    isOverdue: Boolean,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
     markAsCompleted: () -> Unit
@@ -211,36 +211,37 @@ private fun TaskItem(
                     }
                 )
             )
-       },
-        textStyleEffect = TextStyle(textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None),
+        },
+        checkBoxTextStyleEffect = TextStyle(textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None),
+        isOverdue = isOverdue,
         modifier = Modifier
-           .padding(vertical = 2.dp)
-           .fillMaxWidth()
-           .combinedClickable(
+            .padding(vertical = 2.dp)
+            .fillMaxWidth()
+            .combinedClickable(
                onClick = { onNavigateToTaskDetails(task.id.toString(), null) },
                onLongClick = {
                    vibration()
                    onNavigateToSelectionScreen()
                }
-           )
+            )
     )
 }
 
-@Preview
-@Composable
-fun TaskItemPreview() {
-    TaskifyTheme {
-        TaskItem(
-            task = Task(
-                id = 2,
-                title = "Test2",
-                description = "Description for Test2 task",
-                date = 456L,
-                priority = Priority.Low,
-            ),
-            onNavigateToTaskDetails = { _, _: String? -> },
-            onNavigateToSelectionScreen = { },
-            markAsCompleted = {}
-        )
-    }
-}
+//@Preview
+//@Composable
+//fun TaskItemPreview() {
+//    TaskifyTheme {
+//        TaskItem(
+//            task = Task(
+//                id = 2,
+//                title = "Test2",
+//                description = "Description for Test2 task",
+//                date = 456L,
+//                priority = Priority.Low,
+//            ),
+//            onNavigateToTaskDetails = { _, _: String? -> },
+//            onNavigateToSelectionScreen = { },
+//            markAsCompleted = {}
+//        )
+//    }
+//}
