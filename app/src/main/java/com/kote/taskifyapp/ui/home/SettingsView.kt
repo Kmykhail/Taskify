@@ -100,8 +100,8 @@ fun SettingsView(
                             settingTitle = "View"
                             settingType = SettingType.TaskViewType
                             settingItems = listOf(
-                                Pair(TaskViewType.List.name,TaskViewType.List.ordinal),
-                                Pair(TaskViewType.VerticalGrid.name, TaskViewType.VerticalGrid.ordinal)
+                                Pair(TaskViewType.DefaultView.name,TaskViewType.DefaultView.ordinal),
+                                Pair(TaskViewType.CardView.name, TaskViewType.CardView.ordinal)
                             )
                             showSettingDialog = true
                         }
@@ -194,12 +194,12 @@ fun ShowSettingDialogPreview() {
             title = "View",
             currentItem = 0,
             itemList = listOf(
-                Pair(TaskViewType.List.name,TaskViewType.List.ordinal),
-                Pair(TaskViewType.VerticalGrid.name, TaskViewType.VerticalGrid.ordinal),
-                Pair(TaskViewType.VerticalGrid.name, TaskViewType.VerticalGrid.ordinal),
-                Pair(TaskViewType.VerticalGrid.name, TaskViewType.VerticalGrid.ordinal),
-                Pair(TaskViewType.VerticalGrid.name, TaskViewType.VerticalGrid.ordinal),
-                Pair(TaskViewType.VerticalGrid.name, TaskViewType.VerticalGrid.ordinal),
+                Pair(TaskViewType.DefaultView.name,TaskViewType.DefaultView.ordinal),
+                Pair(TaskViewType.CardView.name, TaskViewType.CardView.ordinal),
+                Pair(TaskViewType.CardView.name, TaskViewType.CardView.ordinal),
+                Pair(TaskViewType.CardView.name, TaskViewType.CardView.ordinal),
+                Pair(TaskViewType.CardView.name, TaskViewType.CardView.ordinal),
+                Pair(TaskViewType.CardView.name, TaskViewType.CardView.ordinal),
             ),
             onConfirmation = { _ -> },
             onDismissRequest = {}

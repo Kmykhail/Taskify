@@ -27,8 +27,6 @@ import com.kote.taskifyapp.ui.settings.SettingsViewModel
 import com.kote.taskifyapp.util.convertLocalDateToMillis
 import com.kote.taskifyapp.util.convertMillisToLocalDate
 import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.ZoneId
 
 @Composable
 fun HomeScreen(
@@ -44,15 +42,6 @@ fun HomeScreen(
     val settingsUiState by settingsViewModel.settingsUiState.collectAsState()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-
-//    if (settingsUiState.taskViewType == TaskViewType.VerticalGrid) {
-//        val language  = "de"
-//        val locale = Locale(language)
-//        Locale.setDefault(locale)
-//        val config = Configuration()
-//        config.setLocale(locale)
-//        context.resources.updateConfiguration(config, context.resources.displayMetrics)
-//    }
 
     DisposableEffect(Unit) {
         Log.d("Debug", "HomeScreen Entered")
@@ -116,6 +105,7 @@ fun HomeScreen(
                 when (tasksUiState!!.userHomeScreens) {
                     UserHomeScreens.TASKS -> {
                         HomeListView(
+                            taskViewType = settingsUiState.taskViewType,
                             groupedTasks = groupedTasks,
                             onNavigateToTaskDetails = onNavigateToTaskDetails,
                             onNavigateToSelectionScreen = onNavigateToSelectionScreen,

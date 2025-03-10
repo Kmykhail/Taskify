@@ -12,11 +12,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 enum class TaskViewType {
-    List,
-    VerticalGrid;
+    DefaultView,
+    CardView;
 
     companion object {
-        fun fromInt(value: Int) = enumValues<TaskViewType>().getOrNull(value) ?: List
+        fun fromInt(value: Int) = enumValues<TaskViewType>().getOrNull(value) ?: DefaultView
     }
 }
 
@@ -25,7 +25,7 @@ enum class SettingType {
 }
 
 data class SettingsUiState(
-    val taskViewType: TaskViewType = TaskViewType.List
+    val taskViewType: TaskViewType = TaskViewType.DefaultView
 )
 
 @HiltViewModel

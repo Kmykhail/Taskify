@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -56,11 +57,14 @@ import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.R
 import com.kote.taskifyapp.data.Priority
 import com.kote.taskifyapp.data.Task
-import com.kote.taskifyapp.ui.components.TaskSummary
+import com.kote.taskifyapp.ui.components.TaskSummaryCardView
+import com.kote.taskifyapp.ui.components.TaskSummaryDefaultView
+import com.kote.taskifyapp.ui.settings.TaskViewType
 import com.kote.taskifyapp.ui.theme.TaskifyTheme
 
 @Composable
 fun HomeListView(
+    taskViewType: TaskViewType = TaskViewType.DefaultView,
     groupedTasks: Map<String, List<Task>>,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
@@ -90,6 +94,7 @@ fun HomeListView(
                     }
                 }
                 TaskSection(
+                    taskViewType = taskViewType,
                     title = title,
                     tasks = taskList,
                     isExpanded = expandedStates.getOrPut(title) { true },
@@ -105,6 +110,7 @@ fun HomeListView(
 
 @Composable
 fun TaskSection(
+    taskViewType: TaskViewType,
     title: String,
     tasks: List<Task>,
     isExpanded: Boolean,
@@ -113,11 +119,12 @@ fun TaskSection(
     onNavigateToSelectionScreen: () -> Unit,
     markAsCompleted: (String, Int) -> Unit
 ) {
+    val backgroundColor = if (taskViewType == TaskViewType.DefaultView) MaterialTheme.colorScheme.surfaceContainer else Color.Transparent
     if (tasks.isNotEmpty()) {
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(10.dp))
-                .background(color = MaterialTheme.colorScheme.surfaceContainer)
+                .background(color = backgroundColor)
         ) {
             SectionHeader(title, tasks.size, isExpanded, onToggleExpand)
             AnimatedVisibility(
@@ -128,6 +135,7 @@ fun TaskSection(
                 Column {
                     tasks.forEach { task ->
                         TaskItem(
+                            taskViewType = taskViewType,
                             task = task,
                             isOverdue = title == "Overdue",
                             onNavigateToTaskDetails = onNavigateToTaskDetails,
@@ -177,6 +185,7 @@ private fun SectionHeader(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TaskItem(
+    taskViewType: TaskViewType,
     task: Task,
     isOverdue: Boolean,
     onNavigateToTaskDetails: (String, String?) -> Unit,
@@ -195,53 +204,67 @@ private fun TaskItem(
         }
         vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK))
     }
-    TaskSummary(
-        task = task,
-        checkBox = {
-            Checkbox(
-                checked = task.isCompleted,
-                onCheckedChange = { if (!task.isCompleted) markAsCompleted() },
-                enabled = !task.isCompleted,
-                colors = CheckboxDefaults.colors(
-                    uncheckedColor = when (task.priority) {
-                        Priority.High -> Color(0xFFAF2A2A)
-                        Priority.Medium -> Color(0xFFE0B83D)
-                        Priority.Low -> Color(0xFF93C47D)
-                        else -> MaterialTheme.colorScheme.outline
+    if (taskViewType == TaskViewType.DefaultView) {
+        TaskSummaryDefaultView(
+            task = task,
+            checkBox = {
+                Checkbox(
+                    checked = task.isCompleted,
+                    onCheckedChange = { if (!task.isCompleted) markAsCompleted() },
+                    enabled = !task.isCompleted,
+                    colors = CheckboxDefaults.colors(
+                        uncheckedColor = when (task.priority) {
+                            Priority.High -> Color(0xFFAF2A2A)
+                            Priority.Medium -> Color(0xFFE0B83D)
+                            Priority.Low -> Color(0xFF93C47D)
+                            else -> MaterialTheme.colorScheme.outline
+                        }
+                    )
+                )
+            },
+            mainTextStyleEffect = TextStyle(textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None),
+            isOverdue = isOverdue,
+            modifier = Modifier
+                .padding(vertical = 2.dp)
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = { onNavigateToTaskDetails(task.id.toString(), null) },
+                    onLongClick = {
+                        vibration()
+                        onNavigateToSelectionScreen()
                     }
                 )
-            )
-        },
-        checkBoxTextStyleEffect = TextStyle(textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None),
-        isOverdue = isOverdue,
-        modifier = Modifier
-            .padding(vertical = 2.dp)
-            .fillMaxWidth()
-            .combinedClickable(
-               onClick = { onNavigateToTaskDetails(task.id.toString(), null) },
-               onLongClick = {
-                   vibration()
-                   onNavigateToSelectionScreen()
-               }
-            )
-    )
+        )
+    } else {
+        TaskSummaryCardView(
+            task = task,
+            checkBox = {
+                Checkbox(
+                    checked = task.isCompleted,
+                    onCheckedChange = { if (!task.isCompleted) markAsCompleted() },
+                    enabled = !task.isCompleted,
+                    colors = CheckboxDefaults.colors(
+                        uncheckedColor = when (task.priority) {
+                            Priority.High -> Color(0xFFAF2A2A)
+                            Priority.Medium -> Color(0xFFE0B83D)
+                            Priority.Low -> Color(0xFF93C47D)
+                            else -> MaterialTheme.colorScheme.outline
+                        }
+                    )
+                )
+            },
+            mainTextStyleEffect = TextStyle(textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None),
+            isOverdue = isOverdue,
+            modifier = Modifier
+                .heightIn(min = 56.dp, max = 100.dp)
+                .combinedClickable(
+                    onClick = { onNavigateToTaskDetails(task.id.toString(), null) },
+                    onLongClick = {
+                        vibration()
+                        onNavigateToSelectionScreen()
+                    }
+                )
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+    }
 }
-
-//@Preview
-//@Composable
-//fun TaskItemPreview() {
-//    TaskifyTheme {
-//        TaskItem(
-//            task = Task(
-//                id = 2,
-//                title = "Test2",
-//                description = "Description for Test2 task",
-//                date = 456L,
-//                priority = Priority.Low,
-//            ),
-//            onNavigateToTaskDetails = { _, _: String? -> },
-//            onNavigateToSelectionScreen = { },
-//            markAsCompleted = {}
-//        )
-//    }
-//}

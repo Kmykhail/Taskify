@@ -197,7 +197,7 @@ private fun CalendarView(
                                     onMonthChanges(if (date.isBefore(month.atDay(1))) -1 else 1)
                                 }
                             })
-                        .size(44.dp)
+                        .size(42.dp)
                 ) {
                     Text(
                         text = date.dayOfMonth.toString(),
