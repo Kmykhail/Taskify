@@ -25,10 +25,10 @@ import com.kote.taskifyapp.util.convertMillisToLocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun TaskSummary(
+fun TaskSummaryDefaultView(
     task: Task,
     checkBox: @Composable () -> Unit,
-    checkBoxTextStyleEffect: TextStyle = TextStyle(),
+    mainTextStyleEffect: TextStyle = TextStyle(),
     isOverdue: Boolean = false,
     modifier: Modifier = Modifier
 ) {
@@ -40,7 +40,7 @@ fun TaskSummary(
         checkBox()
         Text(
             text = task.title ?: stringResource(R.string.untitled),
-            style = checkBoxTextStyleEffect,
+            style = mainTextStyleEffect,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )

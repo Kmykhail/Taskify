@@ -35,7 +35,7 @@ class UserPreferencesRepository @Inject constructor (
 
     val taskViewTypeFlow: Flow<TaskViewType> = dataStore.data
         .map { preference ->
-            val type = preference[TASK_VIEW_TYPE] ?: TaskViewType.List.ordinal
+            val type = preference[TASK_VIEW_TYPE] ?: TaskViewType.DefaultView.ordinal
             TaskViewType.fromInt(type)
         }
         .distinctUntilChanged()
