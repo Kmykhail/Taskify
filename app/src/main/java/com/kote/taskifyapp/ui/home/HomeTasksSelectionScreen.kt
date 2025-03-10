@@ -34,7 +34,7 @@ import com.kote.taskifyapp.R
 import com.kote.taskifyapp.data.Priority
 import com.kote.taskifyapp.data.Task
 import com.kote.taskifyapp.ui.components.CustomCheckBox
-import com.kote.taskifyapp.ui.components.TaskSummary
+import com.kote.taskifyapp.ui.components.TaskSummaryDefaultView
 import com.kote.taskifyapp.ui.theme.TaskifyTheme
 
 @Composable
@@ -117,7 +117,7 @@ private fun ShowTasks(
     ) {
         Column {
             tasks.forEach { task ->
-                TaskSummary(
+                TaskSummaryDefaultView(
                     task = task,
                     checkBox = {
                         CustomCheckBox(
