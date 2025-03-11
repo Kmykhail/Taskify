@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Taskify</string>
+    <string name="side_panel_all">Усі</string>
+    <string name="side_panel_today">Сьогодні</string>
+    <string name="side_panel_planned">Заплановані</string>
+    <string name="side_panel_completed">Виконані</string>
+
+    <string name="alert_time_picker_dismiss">Закрити</string>
+    <string name="alert_ok">Ок</string>
+    <string name="alert_permission_title">Необхідний дозвіл на сповіщення</string>
+    <string name="alert_permission_text">Цьому додатку потрібен дозвіл на сповіщення для коректної роботи. Будь ласка, увімкніть його в налаштуваннях</string>
+    <string name="alert_permission_dismiss">Пропустити</string>
+    <string name="settings">Налаштування</string>
+    <string name="alert_reminder_title">Нагадування</string>
+    <string name="alert_reminder_dismiss">Скасувати</string>
+
+    <string name="planned">Заплановані</string>
+    <string name="active">Активні</string>
+    <string name="overdue">Прострочено</string>
+    <string name="today">Сьогодні</string>
+    <string name="completed">Завершено</string>
+    <string name="not_planned">Не заплановані</string>
+
+    <string name="high_priority">Високий пріоритет</string>
+    <string name="medium_priority">Середній пріоритет</string>
+    <string name="low_priority">Низький пріоритет</string>
+    <string name="no_priority">Без пріоритету</string>
+
+    <string name="task_view">Вигляд таски</string>
+    <string name="language">Мова</string>
+
+    <string name="name_textfield_placeholder">Ім\'я</string>
+    <string name="description_textfield_placeholder">Опис</string>
+
+    <string name="untitled">Без назви</string>
+    <string name="no_description">Без опису</string>
+    <string name="select_all">Вибрати все</string>
+    <string name="cancel">Скасувати</string>
+
+    <string name="deletion_after_30_days">Завершені завдання будуть видалені через 30 днів</string>
+    <string name="no_reminders">Немає нагадувань</string>
+
+    <string name="title_sort">Сортувати за назвою</string>
+    <string name="date_sort">Сортувати за датою</string>
+    <string name="priority_sort">Сортувати за пріоритетом</string>
+
+    <string name="time">Час</string>
+    <string name="reminder">Нагадування</string>
+    <string name="none">Немає</string>
+    <string name="on_time">Вчасно</string>
+
+    <string name="monday">Пн</string>
+    <string name="tuesday">Вт</string>
+    <string name="wednesday">Ср</string>
+    <string name="thursday">Чт</string>
+    <string name="friday">Пт</string>
+    <string name="saturday">Сб</string>
+    <string name="sunday">Нд</string>
+</resources>

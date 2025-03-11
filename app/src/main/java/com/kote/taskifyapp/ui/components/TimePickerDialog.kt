@@ -46,11 +46,11 @@ fun TimerPickerDialog(
                     TextButton(
                         onClick = { onDismissRequest() },
                         modifier = Modifier.padding(8.dp),
-                    ) { Text(stringResource(R.string.alert_time_picker_dismiss), style = MaterialTheme.typography.titleMedium) }
+                    ) { Text(stringResource(R.string.alert_time_picker_dismiss), style = MaterialTheme.typography.titleLarge) }
                     TextButton(
                         onClick = { onConfirmation() },
                         modifier = Modifier.padding(8.dp),
-                    ) { Text(stringResource(R.string.alert_ok), style = MaterialTheme.typography.titleMedium) }
+                    ) { Text(stringResource(R.string.alert_ok), style = MaterialTheme.typography.titleLarge) }
                 }
             }
         }
