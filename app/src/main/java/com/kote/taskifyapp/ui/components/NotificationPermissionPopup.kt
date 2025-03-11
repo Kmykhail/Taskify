@@ -30,7 +30,7 @@ fun ShowPermissionDialog(
                     }
                     context.startActivity(intent)
                 }
-            ) { Text(stringResource(R.string.alert_permission_confirm)) }
+            ) { Text(stringResource(R.string.settings)) }
         }
     )
 }

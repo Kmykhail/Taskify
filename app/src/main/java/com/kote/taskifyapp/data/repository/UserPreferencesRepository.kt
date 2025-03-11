@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.kote.taskifyapp.ui.home.GroupTasksType
+import com.kote.taskifyapp.ui.settings.Language
 import com.kote.taskifyapp.ui.settings.TaskViewType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -19,6 +20,7 @@ class UserPreferencesRepository @Inject constructor (
     private companion object {
         val GROUP_TASK_TYPE = intPreferencesKey("group_task_type")
         val TASK_VIEW_TYPE = intPreferencesKey("task_view_type")
+        val LANGUAGE = intPreferencesKey("language")
     }
 
     suspend fun saveTaskViewType(type: TaskViewType) {
@@ -30,6 +32,12 @@ class UserPreferencesRepository @Inject constructor (
     suspend fun saveGroupTaskType(type: GroupTasksType) {
         dataStore.edit { preference ->
             preference[GROUP_TASK_TYPE] = type.ordinal
+        }
+    }
+
+    suspend fun saveLanguage(language: Language) {
+        dataStore.edit { preference ->
+            preference[LANGUAGE] = language.ordinal
         }
     }
 
@@ -47,6 +55,12 @@ class UserPreferencesRepository @Inject constructor (
             GroupTasksType.fromInt(type)
         }
         .distinctUntilChanged()
+
+    val languageFlow: Flow<Language> = dataStore.data
+        .map { preference ->
+            val lang = preference[LANGUAGE] ?: Language.En.ordinal
+            Language.fromInt(lang)
+        }
 
     suspend fun clear() {
         dataStore.edit { it.clear() }

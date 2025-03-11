@@ -33,7 +33,6 @@ fun HomeTopBar(
     groupTasksType: GroupTasksType,
     onSortChange: (SortType) -> Unit,
     onFiltrationChange: (GroupTasksType) -> Unit,
-    onSwitchView: () -> Unit,
     onOpenSidePanel: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -61,7 +60,15 @@ fun HomeTopBar(
                     modifier = Modifier.size(24.dp)
                 )
             }
-            Text(groupTasksType.name.lowercase().replaceFirstChar { it.uppercase() }, fontWeight = FontWeight.Bold)
+            Text(
+                text = when(groupTasksType) {
+                    GroupTasksType.ALL -> stringResource(R.string.side_panel_all)
+                    GroupTasksType.TODAY -> stringResource(R.string.side_panel_today)
+                    GroupTasksType.PLANNED -> stringResource(R.string.side_panel_planned)
+                    GroupTasksType.COMPLETED -> stringResource(R.string.side_panel_completed)
+                },
+                fontWeight = FontWeight.Bold
+            )
         }
         Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
             IconButton(onClick = { expanded = true }) {
@@ -75,25 +82,6 @@ fun HomeTopBar(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
-//                if (groupTasksType == GroupTasksType.SHOW_ACTIVE) {
-//                    DropdownMenuItem(
-//                        text = { Text("Show completed") },
-//                        leadingIcon = { Icon(imageVector = Icons.Filled.Task, contentDescription = null) },
-//                        onClick = {
-//                            expanded = false
-//                            pendingFilterUpdate = GroupTasksType.SHOW_COMPLETED
-//                        }
-//                    )
-//                } else {
-//                    DropdownMenuItem(
-//                        text = { Text("Hide completed") },
-//                        leadingIcon = { Icon(imageVector = Icons.Outlined.Task, contentDescription = null) },
-//                        onClick = {
-//                            expanded = false
-//                            pendingFilterUpdate = GroupTasksType.SHOW_ACTIVE
-//                        }
-//                    )
-//                }
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.title_sort)) },
                     onClick = {
@@ -112,13 +100,6 @@ fun HomeTopBar(
                     text = { Text(stringResource(R.string.priority_sort)) },
                     onClick = {
                         onSortChange(SortType.Priority)
-                        expanded = false
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text("View") }, // TODO remove to settings
-                    onClick = {
-                        onSwitchView()
                         expanded = false
                     }
                 )

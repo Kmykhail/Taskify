@@ -1,8 +1,10 @@
 package com.kote.taskifyapp.ui.home
 
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kote.taskifyapp.DELAY_FOR_DELETE
+import com.kote.taskifyapp.R
 import com.kote.taskifyapp.data.SortType
 import com.kote.taskifyapp.data.Task
 import com.kote.taskifyapp.data.repository.TaskRepository
@@ -57,13 +59,13 @@ class HomeViewModel @Inject constructor(
     private val _tasksUiState = MutableStateFlow<TasksUiState?>(null)
     val tasksUiState = _tasksUiState.asStateFlow()
 
-    private val _groupedTasks = MutableStateFlow(emptyMap<String, List<Task>>())
+    private val _groupedTasks = MutableStateFlow(emptyMap<Int, List<Task>>())
     val groupedTasks = _groupedTasks.asStateFlow()
 
-    private val _allCalendarTasks = MutableStateFlow(emptyMap<String, List<Task>>())
+    private val _allCalendarTasks = MutableStateFlow(emptyMap<Int, List<Task>>())
     val allCalendarTasks = _allCalendarTasks.asStateFlow()
 
-    private val groupOrder = listOf("Completed", "Overdue", "Not planned", "Active", "Today", "Planned")
+    private val groupOrder = listOf(R.string.completed, R.string.overdue, R.string.not_planned, R.string.active, R.string.today, R.string.planned)
     private val today = LocalDate.now()
 
     init {
@@ -83,10 +85,10 @@ class HomeViewModel @Inject constructor(
                 .map { tasks ->
                     tasks.groupBy {
                         when {
-                            it.isCompleted -> "Completed"
-                            convertMillisToDate(it.date!!) < currentDate -> "Overdue"
-                            convertMillisToDate(it.date!!) == currentDate -> "Today"
-                            else -> "Planned"
+                            it.isCompleted -> R.string.completed
+                            convertMillisToDate(it.date!!) < currentDate -> R.string.overdue
+                            convertMillisToDate(it.date!!) == currentDate -> R.string.today
+                            else -> R.string.planned
                         }
                     }
                 }
@@ -102,10 +104,10 @@ class HomeViewModel @Inject constructor(
                     GroupTasksType.ALL -> {
                         tasks.groupBy {
                             when {
-                                it.isCompleted -> "Completed"
-                                it.date != null && convertMillisToDate(it.date) < currentDate -> "Overdue"
-                                it.date == null -> "Not planned"
-                                else -> "Active"
+                                it.isCompleted -> R.string.completed
+                                it.date != null && convertMillisToDate(it.date) < currentDate -> R.string.overdue
+                                it.date == null -> R.string.not_planned
+                                else -> R.string.active
                             }
                         }
                     }
@@ -113,22 +115,22 @@ class HomeViewModel @Inject constructor(
                         tasks.filter { it.date != null && convertMillisToDate(it.date) <= currentDate }
                             .groupBy {
                                 when {
-                                    it.isCompleted -> "Completed"
-                                    convertMillisToDate(it.date!!) == currentDate -> "Today"
-                                    else -> "Overdue"
+                                    it.isCompleted -> R.string.completed
+                                    convertMillisToDate(it.date!!) == currentDate -> R.string.today
+                                    else -> R.string.overdue
                                 }
                             }
                     }
                     GroupTasksType.COMPLETED -> {
-                        mapOf("Completed" to tasks.filter { it.isCompleted })
+                        mapOf(R.string.completed to tasks.filter { it.isCompleted })
                     }
                     GroupTasksType.PLANNED -> {
-                        mapOf("Planned" to tasks.filter {
+                        mapOf(R.string.planned to tasks.filter {
                             it.date != null && !it.isCompleted && convertMillisToDate(it.date) >= currentDate
                         })
                     }
                 }
-                val sortedGroupedTasks = LinkedHashMap<String, List<Task>>()
+                val sortedGroupedTasks = LinkedHashMap<Int, List<Task>>()
                 for (group in groupOrder) {
                     grouped[group]?.let { taskList ->
                         sortedGroupedTasks[group] = when(uiState.sortType) {
@@ -184,7 +186,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun markAsCompleted(group: String, taskId: Int) {
+    fun markAsCompleted(group: Int, taskId: Int) {
         viewModelScope.launch {
             _groupedTasks.value[group]?.find { it.id == taskId }?.let {
                 val updated = it.copy(
