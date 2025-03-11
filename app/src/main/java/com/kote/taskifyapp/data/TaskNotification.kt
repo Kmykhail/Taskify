@@ -28,7 +28,7 @@ class TaskNotification(
         val pendingIntent: PendingIntent = PendingIntent.getActivity(ctx, taskId, intent, PendingIntent.FLAG_IMMUTABLE)
 
         val notification = NotificationCompat.Builder(ctx, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_android)
+            .setSmallIcon(R.drawable.done)
             .setContentTitle(title)
             .setContentText(description)
             .setContentIntent(pendingIntent)

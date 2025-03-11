@@ -21,7 +21,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.ui.components.SidePanel
 import com.kote.taskifyapp.ui.settings.SettingsViewModel
@@ -43,7 +42,6 @@ fun HomeScreen(
     val settingsUiState by settingsViewModel.settingsUiState.collectAsState()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
 
     DisposableEffect(Unit) {
         Log.d("Debug", "HomeScreen Entered")
