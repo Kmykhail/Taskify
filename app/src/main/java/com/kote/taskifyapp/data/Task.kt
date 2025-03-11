@@ -32,7 +32,6 @@ data class Task (
     val deletionTime: Long? = null,
     val priority: Priority = Priority.NoPriority,
     val tag: List<String> = emptyList(),
-    val isFavorite: Boolean = false,
     val isCompleted: Boolean = false,
     val isCreated: Boolean = false
 )
