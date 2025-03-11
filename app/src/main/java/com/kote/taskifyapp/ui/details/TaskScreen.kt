@@ -132,7 +132,7 @@ fun TaskScreen(
             Box(
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
-                    .heightIn(min = 56.dp, max = (LocalConfiguration.current.screenHeightDp * 0.8).dp)
+                    .heightIn(min = 56.dp, max = (LocalConfiguration.current.screenHeightDp * 0.4).dp)
             ) {
                 CustomTextField(
                     value = task.description ?: "",
