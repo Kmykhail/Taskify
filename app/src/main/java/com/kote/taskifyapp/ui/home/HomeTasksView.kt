@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloat
@@ -65,14 +66,14 @@ import com.kote.taskifyapp.ui.theme.TaskifyTheme
 @Composable
 fun HomeListView(
     taskViewType: TaskViewType = TaskViewType.DefaultView,
-    groupedTasks: Map<String, List<Task>>,
+    groupedTasks: Map<Int, List<Task>>,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
-    markAsCompleted: (String, Int) -> Unit,
+    markAsCompleted: (Int, Int) -> Unit,
     groupTasksType: GroupTasksType? = null,
     paddingValues: PaddingValues = PaddingValues(0.dp),
 ) {
-    val expandedStates = remember { mutableStateMapOf<String, Boolean>() }
+    val expandedStates = remember { mutableStateMapOf<Int, Boolean>() }
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -111,13 +112,13 @@ fun HomeListView(
 @Composable
 fun TaskSection(
     taskViewType: TaskViewType,
-    title: String,
+    @StringRes title: Int,
     tasks: List<Task>,
     isExpanded: Boolean,
     onToggleExpand: () -> Unit,
     onNavigateToTaskDetails: (String, String?) -> Unit,
     onNavigateToSelectionScreen: () -> Unit,
-    markAsCompleted: (String, Int) -> Unit
+    markAsCompleted: (Int, Int) -> Unit
 ) {
     val backgroundColor = if (taskViewType == TaskViewType.DefaultView) MaterialTheme.colorScheme.surfaceContainer else Color.Transparent
     if (tasks.isNotEmpty()) {
@@ -126,7 +127,7 @@ fun TaskSection(
                 .clip(RoundedCornerShape(10.dp))
                 .background(color = backgroundColor)
         ) {
-            SectionHeader(title, tasks.size, isExpanded, onToggleExpand)
+            SectionHeader(stringResource(title), tasks.size, isExpanded, onToggleExpand)
             AnimatedVisibility(
                 visible = isExpanded,
                 enter = fadeIn() + expandVertically(),
@@ -137,7 +138,7 @@ fun TaskSection(
                         TaskItem(
                             taskViewType = taskViewType,
                             task = task,
-                            isOverdue = title == "Overdue",
+                            isOverdue = title == R.string.overdue,
                             onNavigateToTaskDetails = onNavigateToTaskDetails,
                             onNavigateToSelectionScreen = onNavigateToSelectionScreen,
                             markAsCompleted = {markAsCompleted(title, task.id)}

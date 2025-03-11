@@ -12,3 +12,4 @@ const val OVERDUE_NOTIFICATION_ALARM = "OVERDUE_NOTIFICATION_ALARM"
 const val DELAY_FOR_DELETE = 30L * 24 * 60 * 60 * 1000
 //const val DELAY_FOR_DELETE = 60000L
 val CHANNEL_NAME: CharSequence = "Reminder Notifications"
+const val MAX_MONTH = 240
