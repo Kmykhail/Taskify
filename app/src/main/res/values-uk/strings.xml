@@ -59,4 +59,5 @@
     <string name="sunday">Нд</string>
     <string name="days_before_removal">Це завдання буде видалено через %d днів</string>
     <string name="selected">%d вибрано</string>
+    <string name="no_date">Без\nдати</string>
 </resources>
