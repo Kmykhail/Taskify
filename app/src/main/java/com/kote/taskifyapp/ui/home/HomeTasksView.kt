@@ -53,7 +53,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.R
 import com.kote.taskifyapp.data.Priority
@@ -61,7 +60,6 @@ import com.kote.taskifyapp.data.Task
 import com.kote.taskifyapp.ui.components.TaskSummaryCardView
 import com.kote.taskifyapp.ui.components.TaskSummaryDefaultView
 import com.kote.taskifyapp.ui.settings.TaskViewType
-import com.kote.taskifyapp.ui.theme.TaskifyTheme
 
 @Composable
 fun HomeListView(

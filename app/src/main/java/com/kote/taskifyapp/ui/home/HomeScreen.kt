@@ -115,7 +115,6 @@ fun HomeScreen(
                     }
                     UserHomeScreens.CALENDAR -> {
                         HomeCalendarView(
-                            locale = settingsUiState.language.name.lowercase(),
                             groupedTasks = allCalendarTasks,
                             selectedDate = convertMillisToLocalDate(tasksUiState!!.selectedDate!!),
                             setSelectedDate = { homeViewModel.setSelectedDay(convertLocalDateToMillis(it)) },

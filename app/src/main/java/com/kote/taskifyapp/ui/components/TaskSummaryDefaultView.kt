@@ -19,6 +19,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kote.taskifyapp.LocalAppLocale
 import com.kote.taskifyapp.R
 import com.kote.taskifyapp.data.Task
 import com.kote.taskifyapp.util.convertMillisToLocalDate
@@ -32,6 +33,8 @@ fun TaskSummaryDefaultView(
     isOverdue: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    val locale = LocalAppLocale.current
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
@@ -49,10 +52,11 @@ fun TaskSummaryDefaultView(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(end = 8.dp)
         ) {
-            val taskLocalDate = if (task.date != null) convertMillisToLocalDate(task.date) else null
-            if (taskLocalDate != null) {
+            val taskDate = if (task.date != null) convertMillisToLocalDate(task.date) else null
+            if (taskDate != null) {
+                val month = taskDate.month.getDisplayName(java.time.format.TextStyle.SHORT_STANDALONE, locale).replaceFirstChar { it.uppercase() }
                 Text(
-                    text = "${taskLocalDate.format(DateTimeFormatter.ofPattern("MMM"))} ${taskLocalDate.dayOfMonth}",
+                    text = "$month ${taskDate.dayOfMonth}",
                     fontSize = 12.sp,
                     color = if (isOverdue) Color(0xFFAF2A2A) else MaterialTheme.colorScheme.onSurface
                 )
