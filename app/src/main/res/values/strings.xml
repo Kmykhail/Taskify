@@ -59,4 +59,5 @@
     <string name="sunday">Sun</string>
     <string name="days_before_removal">This task will be deleted in %d days</string>
     <string name="selected">%d selected</string>
+    <string name="no_date">No\ndate</string>
 </resources>
