@@ -149,7 +149,7 @@ private fun TopBar(
         modifier = modifier
     ) {
         Text(
-            text = "$selectedTasksCount Selected",
+            text = stringResource(R.string.selected, selectedTasksCount),
             style = MaterialTheme.typography.headlineSmall,
         )
     }

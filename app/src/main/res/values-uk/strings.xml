@@ -27,7 +27,7 @@
     <string name="low_priority">Низький пріоритет</string>
     <string name="no_priority">Без пріоритету</string>
 
-    <string name="task_view">Вигляд таски</string>
+    <string name="task_view">Вигляд завдання</string>
     <string name="language">Мова</string>
 
     <string name="name_textfield_placeholder">Ім\'я</string>
@@ -57,4 +57,6 @@
     <string name="friday">Пт</string>
     <string name="saturday">Сб</string>
     <string name="sunday">Нд</string>
+    <string name="days_before_removal">Це завдання буде видалено через %d днів</string>
+    <string name="selected">%d вибрано</string>
 </resources>

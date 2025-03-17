@@ -205,9 +205,10 @@ private fun ShowCompletedBar(
             enabled = task.isCreated
         ) { Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete task", tint = MaterialTheme.colorScheme.primary) }
     }
+    val remainingDays = (task.deletionTime!! - System.currentTimeMillis()) / 86_400_000.0
     Text(
-        text = "This task will be deleted in ${TimeUnit.MILLISECONDS.toDays(task.deletionTime!! - System.currentTimeMillis())} day",
-        textAlign = TextAlign.Justify,
+        text = stringResource(R.string.days_before_removal, kotlin.math.round(remainingDays).toInt()),
+        textAlign = TextAlign.Center,
         modifier = Modifier.padding(bottom = 8.dp)
     )
 }
