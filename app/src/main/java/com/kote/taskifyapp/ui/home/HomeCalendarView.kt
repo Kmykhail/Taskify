@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.kote.taskifyapp.LocalAppLocale
 import com.kote.taskifyapp.MAX_MONTH
 import com.kote.taskifyapp.R
 import com.kote.taskifyapp.data.Task
@@ -44,11 +45,9 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
-import java.util.Locale
 
 @Composable
 fun HomeCalendarView(
-    locale: String,
     groupedTasks: Map<Int, List<Task>>,
     selectedDate: LocalDate,
     setSelectedDate: (LocalDate) -> Unit,
@@ -60,10 +59,11 @@ fun HomeCalendarView(
     val currentYearMonth = remember { YearMonth.now() }
     val pagerState = rememberPagerState(initialPage = MAX_MONTH / 2, pageCount = { MAX_MONTH })
     var dateString by remember { mutableStateOf("") }
+    val locale = LocalAppLocale.current
 
     LaunchedEffect(pagerState.currentPage) {
         val currentMonth = currentYearMonth.plusMonths(pagerState.currentPage - (MAX_MONTH / 2).toLong())
-        val monthName = currentMonth.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale(locale))
+        val monthName = currentMonth.month.getDisplayName(TextStyle.FULL_STANDALONE, locale)
         dateString = "${monthName.replaceFirstChar { it.uppercase() }} ${currentMonth.year}"
     }
 

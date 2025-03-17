@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.kote.taskifyapp.LocalAppLocale
 import com.kote.taskifyapp.R
 import com.kote.taskifyapp.data.Task
 import com.kote.taskifyapp.util.convertMillisToLocalDate
@@ -38,6 +39,8 @@ fun TaskSummaryCardView(
     isOverdue: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val locale = LocalAppLocale.current
+
     Card(modifier = modifier) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -54,20 +57,22 @@ fun TaskSummaryCardView(
                 Text(
                     task.date?.let { dateMilli ->
                         val taskDate = convertMillisToLocalDate(dateMilli)
+                        val dayOfWeek = taskDate.dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT_STANDALONE, locale).replaceFirstChar { it.uppercase() }
+                        val month = taskDate.month.getDisplayName(java.time.format.TextStyle.SHORT_STANDALONE, locale).replaceFirstChar { it.uppercase() }
                         buildAnnotatedString {
                             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.outline, fontWeight = FontWeight.Bold)) {
-                                append("${taskDate.dayOfWeek.name.substring(0, 3).lowercase().replaceFirstChar { it.uppercase() }}\n")
+                                append("$dayOfWeek\n")
                             }
                             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
                                 append("${taskDate.dayOfMonth}\n")
                             }
                             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.outline, fontWeight = FontWeight.Bold)) {
-                                append(taskDate.month.name.substring(0, 3).lowercase().replaceFirstChar { it.uppercase() })
+                                append(month)
                             }
                         }
                     } ?: buildAnnotatedString {
                         withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
-                            append("No\nDate")
+                            append(stringResource(R.string.no_date))
                         }
                     }
                 )
