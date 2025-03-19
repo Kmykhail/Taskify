@@ -43,11 +43,6 @@ fun HomeScreen(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    DisposableEffect(Unit) {
-        Log.d("Debug", "HomeScreen Entered")
-        onDispose { Log.d("Debug", "HomeScreen Exited") }
-    }
-
     if (tasksUiState == null) {
         CircularProgressIndicator()
     } else {
