@@ -75,13 +75,6 @@ fun TaskScreen(
     val openPrioritySelector = remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    DisposableEffect(Unit) {
-        Log.d("Debug", "TaskScreen Entered")
-        onDispose {
-            Log.d("Debug", "TaskScreen Exited")
-        }
-    }
-
     LaunchedEffect(task.isCreated) {
         if (!task.isCreated) {
             delay(100)
