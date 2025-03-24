@@ -1,9 +1,10 @@
 package com.kote.taskifyapp.ui.home
 
-import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.Icons
@@ -13,15 +14,18 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.kote.taskifyapp.R
 import com.kote.taskifyapp.ui.components.SidePanel
 import com.kote.taskifyapp.ui.settings.SettingsViewModel
 import com.kote.taskifyapp.util.convertLocalDateToMillis
@@ -52,7 +56,6 @@ fun HomeScreen(
             selectedFilterType = tasksUiState!!.groupTasksType,
             onSelectedFilterType = { homeViewModel.setGroupTasksType(it) },
             gestureEnabled = tasksUiState!!.userHomeScreens == UserHomeScreens.TASKS,
-            modifier = modifier
         ) {
             Scaffold(
                 topBar = {
@@ -62,9 +65,21 @@ fun HomeScreen(
                             onSortChange = homeViewModel::setSortType,
                             onFiltrationChange = homeViewModel::setGroupTasksType,
                             onOpenSidePanel = { scope.launch { drawerState.open() } },
-                            modifier = modifier
+                            modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 8.dp, end = 8.dp, top = 8.dp)
+                                .padding(horizontal = 8.dp) // start = 8.dp, end = 8.dp, top = 8.dp
+                                .statusBarsPadding()
+                        )
+                    } else if (tasksUiState!!.userHomeScreens == UserHomeScreens.SETTINGS) {
+                        Text(
+                            text = stringResource(R.string.settings),
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 12.dp, bottom = 12.dp)
+                                .padding(horizontal = 20.dp)
+                                .statusBarsPadding()
                         )
                     }
                 },
@@ -74,7 +89,8 @@ fun HomeScreen(
                         onHomeScreenClick = { homeViewModel.setUserHomeScreens(it) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 8.dp, bottom = 24.dp, start = 32.dp, end = 32.dp)
+                            .padding(horizontal = 32.dp)// top = 8.dp, bottom = 24.dp, start = 32.dp, end
+                            .navigationBarsPadding()
                     )
                 },
                 floatingActionButton = {
@@ -94,7 +110,7 @@ fun HomeScreen(
                             )
                         }
                     }
-                }
+                },
             ) { paddingValues ->
                 when (tasksUiState!!.userHomeScreens) {
                     UserHomeScreens.TASKS -> {
@@ -122,7 +138,7 @@ fun HomeScreen(
                         SettingsView(
                             settingsUiState = settingsUiState,
                             setSettings = settingsViewModel::setSettings,
-                            modifier = modifier.padding(paddingValues)
+                            paddingValues = paddingValues
                         )
                     }
                 }
