@@ -1,7 +1,7 @@
 package com.kote.taskifyapp.ui.components
 
-import android.gesture.Gesture
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -58,8 +58,10 @@ fun SidePanel(
             ModalDrawerSheet {
                 Column(
                     modifier = modifier
+                        .fillMaxHeight()
                         .width((LocalConfiguration.current.screenWidthDp * 0.8).dp)
                         .verticalScroll(rememberScrollState())
+                        .padding(top = 10.dp)
                 ) {
                     items.forEach { item ->
                         NavigationDrawerItem(

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
@@ -51,6 +52,7 @@ import kotlinx.coroutines.launch
 fun SettingsView(
     settingsUiState: SettingsUiState,
     setSettings: (SettingType, Int, Context) -> Unit,
+    paddingValues:  PaddingValues = PaddingValues(0.dp),
     modifier: Modifier = Modifier
 ) {
     var showSettingDialog by remember { mutableStateOf(false) }
@@ -78,55 +80,54 @@ fun SettingsView(
         )
     }
 
-    Column (
+    LazyColumn (
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
+            .padding(paddingValues)
             .padding(horizontal = 10.dp)
             .fillMaxSize()
     ) {
-        Text(
-            text = stringResource(R.string.settings),
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .align(Alignment.Start)
-                .padding(start = 2.dp, bottom = 10.dp)
-        )
-
-        Card(
-            colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-        ) {
-            Column{
-                SettingSummary(
-                    title = R.string.language,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            settingTitle = R.string.language
-                            settingType = SettingType.Language
-                            settingItems = listOf(
-                                Pair(Language.En.name, Language.En.ordinal),
-                                Pair(Language.Uk.name, Language.Uk.ordinal)
-                            )
-                            showSettingDialog = true
-                        }
-                        .padding(10.dp)
-                )
-                SettingSummary(
-                    title = R.string.task_view,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            settingTitle = R.string.task_view
-                            settingType = SettingType.TaskViewType
-                            settingItems = listOf(
-                                Pair(TaskViewType.DefaultView.name, TaskViewType.DefaultView.ordinal),
-                                Pair(TaskViewType.CardView.name, TaskViewType.CardView.ordinal)
-                            )
-                            showSettingDialog = true
-                        }
-                        .padding(10.dp)
-                )
+        item {
+            Card(
+                colors = CardDefaults.cardColors()
+                    .copy(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Column {
+                    SettingSummary(
+                        title = R.string.language,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                settingTitle = R.string.language
+                                settingType = SettingType.Language
+                                settingItems = listOf(
+                                    Pair(Language.En.name, Language.En.ordinal),
+                                    Pair(Language.Uk.name, Language.Uk.ordinal)
+                                )
+                                showSettingDialog = true
+                            }
+                            .padding(10.dp)
+                    )
+                    SettingSummary(
+                        title = R.string.task_view,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                settingTitle = R.string.task_view
+                                settingType = SettingType.TaskViewType
+                                settingItems = listOf(
+                                    Pair(
+                                        TaskViewType.DefaultView.name,
+                                        TaskViewType.DefaultView.ordinal
+                                    ),
+                                    Pair(TaskViewType.CardView.name, TaskViewType.CardView.ordinal)
+                                )
+                                showSettingDialog = true
+                            }
+                            .padding(10.dp)
+                    )
+                }
             }
         }
     }
