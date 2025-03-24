@@ -4,8 +4,11 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -36,6 +39,7 @@ class MainActivity : AppCompatActivity() {
         val locale = Locale(storedLanguage.name.lowercase())
 
         enableEdgeToEdge()
+
         setContent {
             CompositionLocalProvider(LocalAppLocale provides locale) {
                 TaskifyTheme {
@@ -44,7 +48,9 @@ class MainActivity : AppCompatActivity() {
                     ) { innerPadding ->
                         TaskifyNavGraph(
                             navController = rememberNavController(),
-                            modifier = Modifier.padding(innerPadding)
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .windowInsetsPadding(WindowInsets.safeDrawing)
                         )
                     }
                 }
