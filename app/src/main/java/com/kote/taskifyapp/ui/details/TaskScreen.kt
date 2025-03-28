@@ -49,7 +49,10 @@ import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.ui.components.CustomTextField
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import com.kote.taskifyapp.R
 import com.kote.taskifyapp.data.Priority
@@ -109,6 +112,7 @@ fun TaskScreen(
                 .padding(horizontal = 10.dp)
                 .clip(RoundedCornerShape(10.dp))
                 .background(color = MaterialTheme.colorScheme.surfaceContainer)
+                .testTag("Task layout")
         ) {
             CustomTextField(
                 value = task.title ?: "",
@@ -121,6 +125,7 @@ fun TaskScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(focusRequester1)
+                    .semantics { contentDescription = "New task" }
             )
             Box(
                 modifier = Modifier

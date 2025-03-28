@@ -1,6 +1,9 @@
 <resources>
-    <string name="app_name">Taskify</string>
+    <string name="content_desc_home_btn" translatable="false">Home</string>
+    <string name="content_desc_calendar_btn" translatable="false">Calendar</string>
+    <string name="content_desc_settings_btn" translatable="false">Settings</string>
 
+    <string name="app_name">Taskify</string>
     <string name="side_panel_all">All</string>
     <string name="side_panel_today">Today</string>
     <string name="side_panel_planned">Planned</string>

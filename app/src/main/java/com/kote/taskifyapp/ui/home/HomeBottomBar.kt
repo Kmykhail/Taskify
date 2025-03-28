@@ -13,7 +13,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kote.taskifyapp.R
 
 @Composable
 fun HomeBottomBar(
@@ -32,7 +34,7 @@ fun HomeBottomBar(
         ) {
             Icon(
                 imageVector = Icons.Filled.DashboardCustomize,
-                contentDescription = "Home",
+                contentDescription = stringResource(R.string.content_desc_home_btn),
                 tint = if (userHomeScreen == UserHomeScreens.TASKS) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                 modifier = Modifier.size(26.dp)
             )
@@ -42,7 +44,7 @@ fun HomeBottomBar(
         ) {
             Icon(
                 imageVector = Icons.Default.Today,
-                contentDescription = "Calendar",
+                contentDescription = stringResource(R.string.content_desc_calendar_btn),
                 tint = if (userHomeScreen == UserHomeScreens.CALENDAR) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                 modifier = Modifier.size(26.dp)
             )
@@ -52,7 +54,7 @@ fun HomeBottomBar(
         ) {
             Icon(
                 imageVector = Icons.Default.Settings,
-                contentDescription = "Settings",
+                contentDescription = stringResource(R.string.content_desc_settings_btn),
                 tint = if (userHomeScreen == UserHomeScreens.SETTINGS) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                 modifier = Modifier.size(26.dp)
             )
