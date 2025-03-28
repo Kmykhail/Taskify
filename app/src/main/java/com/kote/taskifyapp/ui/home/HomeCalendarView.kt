@@ -37,7 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kote.taskifyapp.LocalAppLocale
-import com.kote.taskifyapp.MAX_MONTH
+import com.kote.taskifyapp.util.MAX_MONTH
 import com.kote.taskifyapp.R
 import com.kote.taskifyapp.data.Task
 import com.kote.taskifyapp.util.convertMillisToLocalDate

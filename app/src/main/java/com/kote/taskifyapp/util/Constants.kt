@@ -1,4 +1,4 @@
-package com.kote.taskifyapp
+package com.kote.taskifyapp.util
 
 const val KEY_TITLE = "KEY_TITLE"
 const val KEY_DESCRIPTION = "KEY_DESCRIPTION"

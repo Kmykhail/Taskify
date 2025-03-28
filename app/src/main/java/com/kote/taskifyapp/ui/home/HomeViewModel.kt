@@ -1,9 +1,8 @@
 package com.kote.taskifyapp.ui.home
 
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kote.taskifyapp.DELAY_FOR_DELETE
+import com.kote.taskifyapp.util.DELAY_FOR_DELETE
 import com.kote.taskifyapp.R
 import com.kote.taskifyapp.data.SortType
 import com.kote.taskifyapp.data.Task

@@ -8,8 +8,8 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.kote.taskifyapp.CHANNEL_ID
-import com.kote.taskifyapp.CHANNEL_NAME
+import com.kote.taskifyapp.util.CHANNEL_ID
+import com.kote.taskifyapp.util.CHANNEL_NAME
 import com.kote.taskifyapp.MainActivity
 import com.kote.taskifyapp.R
 
