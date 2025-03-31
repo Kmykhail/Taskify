@@ -1,0 +1,75 @@
+name: Android UI Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  instrumentation-tests:
+    name: Run UI Tests
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Update SDK Manager
+        run: sdkmanager --update
+
+      - name: Install Required SDK Components
+        run: |
+          sdkmanager --install "platforms;android-34"
+          sdkmanager --install "system-images;android-34;google_apis;arm64-v8a"
+          sdkmanager --install emulator
+
+      - name: Accept Licenses
+        run: yes | sdkmanager --licenses
+
+      - name: Create AVD
+        run: |
+          echo "no" | avdmanager create avd -n new_avd -k "system-images;android-34;google_apis;arm64-v8a"
+#        env:
+#          ANDROID_AVD_HOME: /home/runner/.android/avd
+
+#      - name: Debug AVD Path
+#        run: ls -la $ANDROID_AVD_HOME
+#        env:
+#          ANDROID_AVD_HOME: /home/runner/.android/avd
+
+      - name: List AVDs
+        run: avdmanager list avd
+
+#      - name: AVD Permissions
+#        run: |
+#          if [ -d "$ANDROID_AVD_HOME" ]; then
+#            chmod -R 777 "$ANDROID_AVD_HOME"
+#          else
+#            echo "AVD directory does not exist"
+#            exit 1
+#          fi
+#        env:
+#          ANDROID_AVD_HOME: /home/runner/.android/avd
+
+      - name: Start Emulator
+        run: |
+          $ANDROID_HOME/emulator/emulator -avd new_avd -no-window -noaudio -no-boot-anim -gpu swiftshader_indirect &
+          adb wait-for-device
+          sleep 120
+
+      - name: Check Devices
+        run: adb devices
+
+      - name: Instrumented Tests
+        run: ./gradlew connectedDebugAndroidTest
