@@ -48,7 +48,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -124,6 +127,7 @@ fun TaskSection(
             modifier = Modifier
                 .clip(RoundedCornerShape(10.dp))
                 .background(color = backgroundColor)
+                .semantics { contentDescription = "Tasks view" }
         ) {
             SectionHeader(stringResource(title), tasks.size, isExpanded, onToggleExpand)
             AnimatedVisibility(
@@ -218,7 +222,8 @@ private fun TaskItem(
                             Priority.Low -> Color(0xFF93C47D)
                             else -> MaterialTheme.colorScheme.outline
                         }
-                    )
+                    ),
+                    modifier = Modifier.semantics { contentDescription = "Checkbox" }
                 )
             },
             mainTextStyleEffect = TextStyle(textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None),

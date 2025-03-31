@@ -125,7 +125,7 @@ fun TaskScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(focusRequester1)
-                    .semantics { contentDescription = "New task" }
+                    .semantics { contentDescription = "Task title" }
             )
             Box(
                 modifier = Modifier
@@ -140,6 +140,7 @@ fun TaskScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .focusRequester(focusRequester2)
+                        .semantics { contentDescription = "Task description" }
                 )
             }
             if (task.isCompleted) {
