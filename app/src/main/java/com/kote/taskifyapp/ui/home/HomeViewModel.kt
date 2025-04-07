@@ -13,6 +13,7 @@ import com.kote.taskifyapp.util.convertLocalDateToMillis
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
@@ -56,7 +57,7 @@ class HomeViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
     private val _tasksUiState = MutableStateFlow<TasksUiState?>(null)
-    val tasksUiState = _tasksUiState.asStateFlow()
+    val tasksUiState: StateFlow<TasksUiState?> = _tasksUiState
 
     private val _groupedTasks = MutableStateFlow(emptyMap<Int, List<Task>>())
     val groupedTasks = _groupedTasks.asStateFlow()
