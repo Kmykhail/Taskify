@@ -70,7 +70,7 @@ fun HomeScreen(
                             onOpenSidePanel = { scope.launch { drawerState.open() } },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 8.dp) // start = 8.dp, end = 8.dp, top = 8.dp
+                                .padding(horizontal = 8.dp)
                                 .statusBarsPadding()
                         )
                     } else if (tasksUiState!!.userHomeScreens == UserHomeScreens.SETTINGS) {
@@ -92,7 +92,7 @@ fun HomeScreen(
                         onHomeScreenClick = { homeViewModel.setUserHomeScreens(it) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 32.dp)// top = 8.dp, bottom = 24.dp, start = 32.dp, end
+                            .padding(horizontal = 32.dp)
                             .navigationBarsPadding()
                     )
                 },

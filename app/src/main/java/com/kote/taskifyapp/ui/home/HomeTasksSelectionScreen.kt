@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -65,9 +67,9 @@ fun HomeTasksSelectionScreen(
         topBar = {
             TopBar(
                 selectedTasksCount = selectedTask.size,
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 12.dp)
+                modifier = Modifier
+                    .statusBarsPadding()
+                    .padding(8.dp)
             )
         },
         bottomBar = {
@@ -82,7 +84,8 @@ fun HomeTasksSelectionScreen(
                 selectedTasks = selectedTask.isNotEmpty(),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp, bottom = 24.dp, start = 32.dp, end = 32.dp)
+                    .navigationBarsPadding()
+                    .padding(horizontal = 32.dp)
             )
         },
     ) { paddingValues ->
