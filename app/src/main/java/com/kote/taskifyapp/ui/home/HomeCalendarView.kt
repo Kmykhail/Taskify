@@ -178,6 +178,7 @@ private fun CalendarView(
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .padding(horizontal = 6.dp)
                 .padding(bottom = 6.dp)

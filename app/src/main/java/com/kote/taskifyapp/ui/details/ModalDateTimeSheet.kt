@@ -216,7 +216,8 @@ private fun ReminderTimeControl(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .padding(horizontal = 8.dp)
+            .padding(bottom = 8.dp)
             .clip(RoundedCornerShape(6.dp))
             .background(color = MaterialTheme.colorScheme.surfaceContainerHigh)
     ) {
