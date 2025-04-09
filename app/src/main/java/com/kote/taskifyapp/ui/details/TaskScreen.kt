@@ -53,6 +53,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import com.kote.taskifyapp.R
 import com.kote.taskifyapp.data.Priority
@@ -118,7 +119,7 @@ fun TaskScreen(
                 value = task.title ?: "",
                 placeholder = stringResource(R.string.name_textfield_placeholder),
                 onValueChange = viewModel::updateTaskTitle,
-                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next, capitalization = KeyboardCapitalization.Sentences),
                 keyboardActions = KeyboardActions(onNext = { focusRequester2.requestFocus() }),
                 isSingleLine = true,
                 readOnly = task.isCompleted,
@@ -136,6 +137,7 @@ fun TaskScreen(
                     value = task.description ?: "",
                     placeholder = stringResource(R.string.description_textfield_placeholder),
                     onValueChange = viewModel::updateTaskDescription,
+                    keyboardOptions = KeyboardOptions.Default.copy(capitalization = KeyboardCapitalization.Sentences),
                     readOnly = task.isCompleted,
                     modifier = Modifier
                         .fillMaxWidth()
